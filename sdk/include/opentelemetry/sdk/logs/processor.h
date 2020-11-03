@@ -25,6 +25,12 @@ namespace sdk
 {
 namespace logs
 {
+enum class ShutdownResult
+{
+  kSuccess = 0,
+  kFailure = 1,
+  kTimeout = 2
+};
 /**
  * The Log Processor is responsible for passing log records
  * to the configured exporter.
