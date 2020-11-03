@@ -1,0 +1,22 @@
+cc_test(
+    name = "logger_provider_test",
+    srcs = [
+        "logger_provider_test.cc",
+    ],
+    deps = [
+        "//sdk/src/logs",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "logger_sdk_test",
+    srcs = [
+        "logger_sdk_test.cc",
+    ],
+    deps = [
+        "//sdk/src/logs",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
