@@ -47,11 +47,13 @@ namespace logs
 
 
        //Send the log record to our processor
-       //Make record a unique_ptr
+       //Convert the LogRecord to the heap
+       /*
+        TODO: Make the API call log(*LogRecord) such that the SDK doesn't
+        need to convert to the heap
+       */
        auto record_pointer =
-       std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(
-          record.timestamp, record.trace_id, record.span_id, record.trace_flag, record.severity,
-          record.name, record.body, record.resource, record.attributes));
+       std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord());
        GetProcessor()->OnReceive(std::move(record_pointer));
    }
 

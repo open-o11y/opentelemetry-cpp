@@ -15,8 +15,6 @@
  */
 
 #include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
-#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 
@@ -51,13 +49,17 @@ TEST(LoggerProviderSDK, LoggerProviderGetLogger)
     ASSERT_EQ(logger1, logger3);
 }
 
-class DummyExporter : public LogExporter
+class DummyProcessor : public LogProcessor
 {
-  ExportResult Export(const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
-  {
-    return ExportResult::kSuccess;
-  }
-  void Shutdown(std::chrono::microseconds timeout) noexcept
+  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept
+  {}
+
+  void ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
+  {}
+
+  void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {}
 };
 
@@ -69,7 +71,7 @@ TEST(LoggerProviderSDK, LoggerProviderProcessor)
     ASSERT_EQ(lp.GetProcessor(), nullptr);
 
     //Create a new processor and check if it is pushed correctly
-    std::shared_ptr<LogProcessor> proc(new SimpleLogProcessor(std::unique_ptr<LogExporter>(new DummyExporter)));
+    std::shared_ptr<LogProcessor> proc = std::shared_ptr<LogProcessor>(new DummyProcessor());
     lp.SetProcessor(proc);
     ASSERT_EQ(proc, lp.GetProcessor());
 }
