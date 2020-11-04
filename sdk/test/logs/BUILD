@@ -1,7 +1,7 @@
 cc_test(
-    name = "logger_provider_test",
+    name = "logger_provider_sdk_test",
     srcs = [
-        "logger_provider_test.cc",
+        "logger_provider_sdk_test.cc",
     ],
     deps = [
         "//api",
