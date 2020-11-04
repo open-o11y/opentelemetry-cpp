@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/sdk/logs/logger.h"
 
 #include <gtest/gtest.h>
 
@@ -23,26 +23,26 @@ using namespace opentelemetry::sdk::logs;
 
 TEST(LoggerSDK, NameCheck)
 {
-    Logger l("My Logger");
-    ASSERT_EQ(l.GetName(), "My Logger");
+  Logger l("My Logger");
+  ASSERT_EQ(l.GetName(), "My Logger");
 }
 
 TEST(LoggerSDK, SeverityLevelTest)
 {
-    Logger l("My Logger");
+  Logger l("My Logger");
 
-    //Set the severity to warn
-    l.SetMinSeverity(opentelemetry::logs::Severity::kWarn);
+  // Set the severity to warn
+  l.SetMinSeverity(opentelemetry::logs::Severity::kWarn);
 
-    //Anything below kWarn should not be enabled
-    ASSERT_FALSE(l.IsEnabled(opentelemetry::logs::Severity::kInfo));
+  // Anything below kWarn should not be enabled
+  ASSERT_FALSE(l.IsEnabled(opentelemetry::logs::Severity::kInfo));
 
-    //Anything above kWarn should be enabled
-    ASSERT_TRUE(l.IsEnabled(opentelemetry::logs::Severity::kError));
+  // Anything above kWarn should be enabled
+  ASSERT_TRUE(l.IsEnabled(opentelemetry::logs::Severity::kError));
 }
 
 TEST(LoggerSDK, ValueInjection)
 {
-    //Not currently implemented inside the SDK
-    //A future PR will cover this
+  // Not currently implemented inside the SDK
+  // A future PR will cover this
 }

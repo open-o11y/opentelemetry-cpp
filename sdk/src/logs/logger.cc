@@ -21,64 +21,60 @@ namespace sdk
 {
 namespace logs
 {
-   Logger::Logger(std::string_view name) noexcept
-        : name_{name}, processor_{nullptr}
-   {}
+Logger::Logger(std::string name) noexcept : name_{name}, processor_{nullptr} {}
 
-   Logger::Logger(std::string_view name, std::shared_ptr<LogProcessor> processor) noexcept
-        : name_{name}, processor_{processor}
-   {}
-   
-   std::string_view Logger::GetName() noexcept
-   {
-       return name_;
-   }
+Logger::Logger(std::string name, std::shared_ptr<LogProcessor> processor) noexcept
+    : name_{name}, processor_{processor}
+{}
 
-   void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
-   {
-       //TODO: Sampler
-       //If this log's severity is less than the minimum severity, do nothing
-       if(!IsEnabled(record.severity))
-            return;
+std::string Logger::GetName() noexcept
+{
+  return name_;
+}
 
-        //Inject timestamp
-        //TODO: Remove const from record to allow for value injection
-        //record.timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
+{
+  // TODO: Sampler
+  // If this log's severity is less than the minimum severity, do nothing
+  if (!IsEnabled(record.severity))
+    return;
 
+  // Inject timestamp
+  // record.timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  // TODO: Remove const from record to allow for value injection
 
-       //Send the log record to our processor
-       //Convert the LogRecord to the heap
-       /*
-        TODO: Make the API call log(*LogRecord) such that the SDK doesn't
-        need to convert to the heap
-       */
-       auto record_pointer =
-       std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord());
-       GetProcessor()->OnReceive(std::move(record_pointer));
-   }
+  // Send the log record to our processor
+  // Convert the LogRecord to the heap
+  /*
+   TODO: Make the API call log(*LogRecord) such that the SDK doesn't
+   need to convert to the heap
+  */
+  auto record_pointer =
+      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+  GetProcessor()->OnReceive(std::move(record_pointer));
+}
 
-   void Logger::SetMinSeverity(opentelemetry::logs::Severity sev) noexcept
-   {
-       minSeverity_ = sev;
-   }
+void Logger::SetMinSeverity(opentelemetry::logs::Severity sev) noexcept
+{
+  minSeverity_ = sev;
+}
 
-   bool Logger::IsEnabled(opentelemetry::logs::Severity sev)
-   {
-       if (sev < minSeverity_)
-            return false;
-       return true;
-   }
+bool Logger::IsEnabled(opentelemetry::logs::Severity sev)
+{
+  if (sev < minSeverity_)
+    return false;
+  return true;
+}
 
-   std::shared_ptr<LogProcessor> Logger::GetProcessor() noexcept
-   {
-       return processor_.load();
-   }
+std::shared_ptr<LogProcessor> Logger::GetProcessor() noexcept
+{
+  return processor_.load();
+}
 
-   void Logger::SetProcessor(std::shared_ptr<LogProcessor> processor) noexcept
-   {
-       processor_.store(processor);
-   }
+void Logger::SetProcessor(std::shared_ptr<LogProcessor> processor) noexcept
+{
+  processor_.store(processor);
+}
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-

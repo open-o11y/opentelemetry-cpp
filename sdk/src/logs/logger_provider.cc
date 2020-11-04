@@ -21,75 +21,77 @@ namespace sdk
 {
 namespace logs
 {
-   LoggerProvider::LoggerProvider(std::shared_ptr<LogProcessor> processor) noexcept
-        : processor_{processor}
-   {}
+LoggerProvider::LoggerProvider(std::shared_ptr<LogProcessor> processor) noexcept
+    : processor_{processor}
+{}
 
-   LoggerProvider::LoggerProvider() noexcept
-        : processor_{nullptr}
-   {}
-   
-   opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(opentelemetry::nostd::string_view name, opentelemetry::nostd::string_view options) noexcept
-   {
-       //Search if a logger with the given name already exists.
-       //If so, return it
-       for(std::shared_ptr<Logger> &logger : loggers_)
-       {
-           if(logger->GetName() == name.data())
-                return opentelemetry::nostd::shared_ptr<Logger>(logger);
-       }
-       //If no logger with that name exists yet,
-       //Create it and add it to the list of loggers
-       auto loggerInstance = new Logger(name.data());
-       loggerInstance->SetProcessor(GetProcessor());
-       std::shared_ptr<Logger> loggerPtr{loggerInstance};
-       loggers_.push_back(loggerPtr);
-       return opentelemetry::nostd::shared_ptr<Logger>(loggerPtr);
-   }
+LoggerProvider::LoggerProvider() noexcept : processor_{nullptr} {}
 
-   opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(opentelemetry::nostd::string_view name, nostd::span<nostd::string_view> args) noexcept
-   {
-   }
+opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view options) noexcept
+{
+  // Search if a logger with the given name already exists.
+  // If so, return it
+  for (std::shared_ptr<Logger> &logger : loggers_)
+  {
+    if (logger->GetName() == name.data())
+      return opentelemetry::nostd::shared_ptr<Logger>(logger);
+  }
+  // If no logger with that name exists yet,
+  // Create it and add it to the list of loggers
+  auto loggerInstance = new Logger(name.data());
+  loggerInstance->SetProcessor(GetProcessor());
+  std::shared_ptr<Logger> loggerPtr{loggerInstance};
+  loggers_.push_back(loggerPtr);
+  return opentelemetry::nostd::shared_ptr<Logger>(loggerPtr);
+}
 
-   
-   /*
-   bool LoggerProvider::RemoveLogger(nostd::string_view name) noexcept
-   {
-       //Search if a logger with the given name already exists.
-       //If so, set it to a Noop logger and remove it from list of loggers
-       int count = 0;
-       for(std::shared_ptr<Logger> &logger : loggers_)
-       {
-           if(logger->GetName() == name.data())
-           {
-               auto loggerPtr = loggers_[count];
-               loggerPtr = new opentelemetry::logs::NoopLogger();
-               loggers_.erase(loggers_.begin() + count);
-               return true;
-           }
-           count++;
-       }
+opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+    opentelemetry::nostd::string_view name,
+    nostd::span<nostd::string_view> args) noexcept
+{
+  // Currently, no args support
+  return GetLogger(name);
+}
 
-       return false;
-   }
-   */
-   
-   std::shared_ptr<LogProcessor> LoggerProvider::GetProcessor() noexcept
-   {
-       return processor_.load();
-   }
+bool LoggerProvider::RemoveLogger(nostd::string_view name) noexcept
+{
+  // Search if a logger with the given name already exists.
+  // If so, set it to a Noop logger and remove it from list of loggers
+  int count = 0;
+  for (std::shared_ptr<Logger> &logger : loggers_)
+  {
+    if (logger->GetName() == name.data())
+    {
+      // TODO: Test this functionality
+      std::shared_ptr<opentelemetry::logs::Logger> apilogger = logger;
+      apilogger.reset(new opentelemetry::logs::NoopLogger);
+      loggers_.erase(loggers_.begin() + count);
+      return true;
+    }
+    count++;
+  }
 
-   void LoggerProvider::SetProcessor(std::shared_ptr<LogProcessor> processor) noexcept
-   {
-       processor_.store(processor);
+  return false;
+}
 
-       //Add this new processor to all the Logger instances
-       for(int i = 0; i < loggers_.size(); i++)
-       {
-            auto sdkLogger = static_cast<Logger *>(loggers_[i].get());
-            sdkLogger->SetProcessor(processor);
-       }
-   }
+std::shared_ptr<LogProcessor> LoggerProvider::GetProcessor() noexcept
+{
+  return processor_.load();
+}
+
+void LoggerProvider::SetProcessor(std::shared_ptr<LogProcessor> processor) noexcept
+{
+  processor_.store(processor);
+
+  // Add this new processor to all the Logger instances
+  for (int i = 0; i < loggers_.size(); i++)
+  {
+    auto sdkLogger = static_cast<Logger *>(loggers_[i].get());
+    sdkLogger->SetProcessor(processor);
+  }
+}
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

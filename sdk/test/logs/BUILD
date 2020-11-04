@@ -4,8 +4,8 @@ cc_test(
         "logger_provider_test.cc",
     ],
     deps = [
-        "//sdk/src/logs",
         "//api",
+        "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
     ],
 )

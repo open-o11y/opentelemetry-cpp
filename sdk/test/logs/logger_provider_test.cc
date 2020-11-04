@@ -24,55 +24,50 @@ using namespace opentelemetry::sdk::logs;
 
 TEST(LoggerProviderSDK, PushToAPI)
 {
-    auto lp = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(new opentelemetry::sdk::logs::LoggerProvider());
-    opentelemetry::logs::Provider::SetLoggerProvider(lp);
+  auto lp = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(
+      new opentelemetry::sdk::logs::LoggerProvider());
+  opentelemetry::logs::Provider::SetLoggerProvider(lp);
 
-    //Check that the loggerprovider was correctly pushed into the API
-    ASSERT_EQ(lp, opentelemetry::logs::Provider::GetLoggerProvider());
+  // Check that the loggerprovider was correctly pushed into the API
+  ASSERT_EQ(lp, opentelemetry::logs::Provider::GetLoggerProvider());
 }
 
 TEST(LoggerProviderSDK, LoggerProviderGetLogger)
 {
-    LoggerProvider lp;
+  LoggerProvider lp;
 
-    auto logger1 = lp.GetLogger("logger1");
-    auto logger2 = lp.GetLogger("logger2");
+  auto logger1 = lp.GetLogger("logger1");
+  auto logger2 = lp.GetLogger("logger2");
 
-    //Check that the logger is not nullptr
-    ASSERT_NE(logger1, nullptr);
+  // Check that the logger is not nullptr
+  ASSERT_NE(logger1, nullptr);
 
-    //Check that two loggers with different names aren't the same instance
-    ASSERT_NE(logger1, logger2);
+  // Check that two loggers with different names aren't the same instance
+  ASSERT_NE(logger1, logger2);
 
-    //Create a logger with the same name as another, check they are the same
-    auto logger3 = lp.GetLogger("logger1");
-    ASSERT_EQ(logger1, logger3);
+  // Create a logger with the same name as another, check they are the same
+  auto logger3 = lp.GetLogger("logger1");
+  ASSERT_EQ(logger1, logger3);
 }
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept
-  {}
+  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
 
-  void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
-  {}
+  void ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
-  {}
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 };
 
 TEST(LoggerProviderSDK, LoggerProviderProcessor)
 {
-    LoggerProvider lp;
+  LoggerProvider lp;
 
-    //Check that initially the processor is null
-    ASSERT_EQ(lp.GetProcessor(), nullptr);
+  // Check that initially the processor is null
+  ASSERT_EQ(lp.GetProcessor(), nullptr);
 
-    //Create a new processor and check if it is pushed correctly
-    std::shared_ptr<LogProcessor> proc = std::shared_ptr<LogProcessor>(new DummyProcessor());
-    lp.SetProcessor(proc);
-    ASSERT_EQ(proc, lp.GetProcessor());
+  // Create a new processor and check if it is pushed correctly
+  std::shared_ptr<LogProcessor> proc = std::shared_ptr<LogProcessor>(new DummyProcessor());
+  lp.SetProcessor(proc);
+  ASSERT_EQ(proc, lp.GetProcessor());
 }
-
