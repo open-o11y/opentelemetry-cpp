@@ -39,16 +39,17 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   if (!IsEnabled(record.severity))
     return;
 
-  /** 
-   * Convert the LogRecord to the heap first before sending to processor. 
-   * TODO: Change the API log(LogRecord) function to log(*LogRecord) so the following line converting to a heap can be removed
-  */
+  /**
+   * Convert the LogRecord to the heap first before sending to processor.
+   * TODO: Change the API log(LogRecord) function to log(*LogRecord) so the following line
+   * converting record a heap variable can be removed
+   */
   auto record_pointer =
       std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
-  
+
   // Inject timestamp
   record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
-  
+
   // TODO: inject traceid/spanid later
 
   // Send the log record to the processor
