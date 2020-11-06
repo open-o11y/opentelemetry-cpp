@@ -21,15 +21,9 @@
 
 using namespace opentelemetry::sdk::logs;
 
-TEST(LoggerSDK, NameCheck)
-{
-  Logger l("My Logger");
-  ASSERT_EQ(l.GetName(), "My Logger");
-}
-
 TEST(LoggerSDK, SeverityLevelTest)
 {
-  Logger l("My Logger");
+  Logger l;
 
   // Set the severity to warn
   l.SetMinSeverity(opentelemetry::logs::Severity::kWarn);

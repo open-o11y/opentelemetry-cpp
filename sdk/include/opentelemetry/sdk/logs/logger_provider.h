@@ -73,7 +73,7 @@ public:
    * return false.
    * @param name The name of the logger to be removed.
    */
-  bool RemoveLogger(nostd::string_view name) noexcept;
+  bool RemoveLogger(std::string name) noexcept;
 
   /**
    * Returns a shared pointer to the processor currently stored in the
@@ -94,7 +94,7 @@ private:
   opentelemetry::sdk::AtomicSharedPtr<LogProcessor> processor_;
 
   // A vector of pointers to all the loggers that have been created
-  std::vector<std::shared_ptr<Logger>> loggers_;
+  std::unordered_map<std::string, std::shared_ptr<Logger>> loggers_;
 };
 }  // namespace logs
 }  // namespace sdk

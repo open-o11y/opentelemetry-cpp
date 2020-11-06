@@ -31,19 +31,19 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     opentelemetry::nostd::string_view name,
     opentelemetry::nostd::string_view options) noexcept
 {
-  // Search if a logger with the given name already exists.
-  // If so, return it
-  for (std::shared_ptr<Logger> &logger : loggers_)
+  // If a logger with a name "name" already exists, return it
+  std::unordered_map<std::string, std::shared_ptr<Logger>>::iterator loggerkv =
+      loggers_.find(name.data());
+  if (loggerkv != loggers_.end())
   {
-    if (logger->GetName() == name.data())
-      return opentelemetry::nostd::shared_ptr<Logger>(logger);
+    return opentelemetry::nostd::shared_ptr<Logger>(loggerkv->second);
   }
+
   // If no logger with that name exists yet,
-  // Create it and add it to the list of loggers
-  auto loggerInstance = new Logger(name.data());
-  loggerInstance->SetProcessor(GetProcessor());
+  // Create it and add it to the map of loggers
+  auto loggerInstance = new Logger(GetProcessor());
   std::shared_ptr<Logger> loggerPtr{loggerInstance};
-  loggers_.push_back(loggerPtr);
+  loggers_[name.data()] = loggerPtr;
   return opentelemetry::nostd::shared_ptr<Logger>(loggerPtr);
 }
 
@@ -55,22 +55,18 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   return GetLogger(name);
 }
 
-bool LoggerProvider::RemoveLogger(nostd::string_view name) noexcept
+bool LoggerProvider::RemoveLogger(std::string name) noexcept
 {
   // Search if a logger with the given name already exists.
   // If so, set it to a Noop logger and remove it from list of loggers
-  int count = 0;
-  for (std::shared_ptr<Logger> &logger : loggers_)
+  std::unordered_map<std::string, std::shared_ptr<Logger>>::iterator loggerkv = loggers_.find(name);
+  if (loggerkv != loggers_.end())
   {
-    if (logger->GetName() == name.data())
-    {
-      // TODO: Test this functionality
-      std::shared_ptr<opentelemetry::logs::Logger> apilogger = logger;
-      apilogger.reset(new opentelemetry::logs::NoopLogger);
-      loggers_.erase(loggers_.begin() + count);
-      return true;
-    }
-    count++;
+    // TODO: Test this functionality
+    std::shared_ptr<opentelemetry::logs::Logger> apilogger = loggerkv->second;
+    apilogger.reset(new opentelemetry::logs::NoopLogger);
+    loggers_.erase(name);
+    return true;
   }
 
   return false;
@@ -86,9 +82,9 @@ void LoggerProvider::SetProcessor(std::shared_ptr<LogProcessor> processor) noexc
   processor_.store(processor);
 
   // Add this new processor to all the Logger instances
-  for (int i = 0; i < loggers_.size(); i++)
+  for (auto loggerkv : loggers_)
   {
-    auto sdkLogger = static_cast<Logger *>(loggers_[i].get());
+    auto sdkLogger = static_cast<Logger *>(loggerkv.second.get());
     sdkLogger->SetProcessor(processor);
   }
 }

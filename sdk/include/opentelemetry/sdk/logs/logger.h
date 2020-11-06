@@ -23,7 +23,7 @@
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/logs/processor.h"
 
-#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -38,19 +38,14 @@ public:
    * Initialize a new logger with a specified name.
    * @param name The name of this logger.
    */
-  explicit Logger(std::string name) noexcept;
+  explicit Logger() noexcept;
 
   /**
    * Initialize a new logger with a specified name and processor.
    * @param name The name of this logger.
    * @param processor The name of the processor.
    */
-  explicit Logger(std::string name, std::shared_ptr<LogProcessor> processor) noexcept;
-
-  /**
-   * Get the name of this Logger.
-   */
-  std::string GetName() noexcept;
+  explicit Logger(std::shared_ptr<LogProcessor> processor) noexcept;
 
   /**
    * Writes a log record into the processor. The log record will only be
@@ -79,7 +74,6 @@ public:
    */
   std::shared_ptr<LogProcessor> GetProcessor() noexcept;
 
-  // Sets the common processor that all the Logger instances will use
   /**
    * Sets the processor that is stored internally in the logger provider.
    * @param processor The processor to be stored inside the logger provider.
@@ -88,9 +82,6 @@ public:
   void SetProcessor(std::shared_ptr<LogProcessor> processor) noexcept;
 
 private:
-  // The name of this Logger
-  std::string name_;
-
   // The minimum severity of this Logger
   opentelemetry::logs::Severity minSeverity_;
 
