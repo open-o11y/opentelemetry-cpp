@@ -65,6 +65,13 @@ TEST(LoggerProviderSDK, LoggerProviderProcessor)
   // Check that initially the processor is null
   ASSERT_EQ(lp.GetProcessor(), nullptr);
 
+  // Check that processor Logger::log() behavior is defined even when there is no processor set
+  Logger logger;
+  opentelemetry::logs::LogRecord r;
+  r.name = "Test log";
+  logger.log(r);  // may not be a reliable check as calling processor->OnReceive() where processor
+                  // is a nullptr does not necessarily throw an exception/error
+
   // Create a new processor and check if it is pushed correctly
   std::shared_ptr<LogProcessor> proc = std::shared_ptr<LogProcessor>(new DummyProcessor());
   lp.SetProcessor(proc);
