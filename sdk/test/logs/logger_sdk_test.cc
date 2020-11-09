@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/sdk/logs/logger.h"
 
 #include <gtest/gtest.h>
@@ -34,6 +33,8 @@ TEST(LoggerSDK, SeverityLevelTest)
   // Anything above kWarn should be enabled
   ASSERT_TRUE(l.IsEnabled(opentelemetry::logs::Severity::kError));
 }
+
+// TODO: add test to check for nullptr processor when Logger::log() is called
 
 TEST(LoggerSDK, ValueInjection)
 {

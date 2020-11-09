@@ -30,7 +30,9 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: Sampler
   // If this log's severity is less than the minimum severity, do nothing
   if (!IsEnabled(record.severity))
+  {
     return;
+  }
 
   /**
    * Convert the LogRecord to the heap first before sending to processor.
@@ -46,7 +48,11 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: inject traceid/spanid later
 
   // Send the log record to the processor
-  GetProcessor()->OnReceive(std::move(record_pointer));
+  auto processor = GetProcessor();
+  // if (processor != nullptr)
+  {
+    processor->OnReceive(std::move(record_pointer));
+  }
 }
 
 void Logger::SetMinSeverity(opentelemetry::logs::Severity sev) noexcept
@@ -57,7 +63,9 @@ void Logger::SetMinSeverity(opentelemetry::logs::Severity sev) noexcept
 bool Logger::IsEnabled(opentelemetry::logs::Severity sev)
 {
   if (sev < minSeverity_)
+  {
     return false;
+  }
   return true;
 }
 
