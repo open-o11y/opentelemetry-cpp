@@ -33,6 +33,13 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   {
     return;
   }
+  
+  // If this logger does not have a processor, no need to create a log record
+  auto processor = GetProcessor();
+  if (processor == nullptr)
+  {
+    return; 
+  }
 
   /**
    * Convert the LogRecord to the heap first before sending to processor.
@@ -47,12 +54,9 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
 
   // TODO: inject traceid/spanid later
 
-  // Send the log record to the processor
-  auto processor = GetProcessor();
-  // if (processor != nullptr)
-  {
-    processor->OnReceive(std::move(record_pointer));
-  }
+  // Send the log record to the processor 
+  processor->OnReceive(std::move(record_pointer));
+  
 }
 
 void Logger::SetMinSeverity(opentelemetry::logs::Severity sev) noexcept
