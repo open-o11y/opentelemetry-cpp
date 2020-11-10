@@ -43,15 +43,17 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   }
 
   // Check if creating a new logger would exceed the max number of loggers
+  // TODO: Remove the noexcept from the API's and SDK's GetLogger(~)
+  /*
   if (loggers_.size() > MAX_LOGGER_COUNT)
   {
 #if __EXCEPTIONS
-    // TODO: Remove the noexcept from the API's and SDK's GetLogger(~)
     throw std::length_error("Number of loggers exceeds max count");
 #else
     std::terminate();
 #endif
   }
+  */
 
   // If no logger with that name exists yet, create it and add it to the map of loggers
   auto loggerInstance = new Logger(GetProcessor());

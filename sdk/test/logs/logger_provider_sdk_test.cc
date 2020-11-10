@@ -83,13 +83,13 @@ TEST(LoggerProviderSDK, LoggerProviderMaxLoggers)
 {
   // TODO: Remove the noexcept from the API's and SDK's GetLogger(~)
 
-#if __EXCEPTIONS
-  // Create more loggers than the LoggerProvider can register
-  // LoggerProvider lp;
-  // for(int i = 0; i < MAX_LOGGER_COUNT; i++)
-  // {
-  //  lp.GetLogger(std::to_string(i));
-  // }
-  // ASSERT_ANY_THROW(lp.GetLogger("NewLogger"));
-#endif
+  // #if __EXCEPTIONS
+  //   Create more loggers than the LoggerProvider can register
+  //   LoggerProvider lp;
+  //   for(int i = 0; i < MAX_LOGGER_COUNT; i++)
+  //   {
+  //    lp.GetLogger(std::to_string(i));
+  //   }
+  //   ASSERT_ANY_THROW(lp.GetLogger("NewLogger"));
+  // #endif
 }
