@@ -22,7 +22,7 @@ using namespace opentelemetry::sdk::logs;
 
 TEST(LoggerSDK, SeverityLevelTest)
 {
-  Logger l;
+  Logger l(nullptr);
 
   // Set the severity to warn
   l.SetMinSeverity(opentelemetry::logs::Severity::kWarn);

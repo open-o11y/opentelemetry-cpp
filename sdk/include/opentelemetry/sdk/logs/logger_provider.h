@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,10 @@
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/processor.h"
+
+// Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
+// TODO: Add link to logging spec once this is added to it
+#define MAX_LOGGER_COUNT 100
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -69,13 +74,6 @@ public:
       nostd::span<nostd::string_view> args) noexcept override;
 
   /**
-   * Removes a logger with the given name. If no logger exists with that name,
-   * return false.
-   * @param name The name of the logger to be removed.
-   */
-  bool RemoveLogger(std::string name) noexcept;
-
-  /**
    * Returns a shared pointer to the processor currently stored in the
    * logger provider. If no processor exists, returns a nullptr
    */
@@ -95,6 +93,9 @@ private:
 
   // A vector of pointers to all the loggers that have been created
   std::unordered_map<std::string, std::shared_ptr<Logger>> loggers_;
+
+  // A mutex that ensures only one thread is using the map of loggers
+  std::mutex mu_;
 };
 }  // namespace logs
 }  // namespace sdk

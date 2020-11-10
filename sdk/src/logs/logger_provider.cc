@@ -31,6 +31,9 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     opentelemetry::nostd::string_view name,
     opentelemetry::nostd::string_view options) noexcept
 {
+  // Ensure only one thread can read/write from the map of loggers
+  std::lock_guard<std::mutex> lock_guard{mu_};
+
   // If a logger with a name "name" already exists, return it
   std::unordered_map<std::string, std::shared_ptr<Logger>>::iterator loggerkv =
       loggers_.find(name.data());
@@ -39,8 +42,18 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     return opentelemetry::nostd::shared_ptr<Logger>(loggerkv->second);
   }
 
-  // If no logger with that name exists yet,
-  // Create it and add it to the map of loggers
+  // Check if creating a new logger would exceed the max number of loggers
+  if (loggers_.size() > MAX_LOGGER_COUNT)
+  {
+#if __EXCEPTIONS
+    // TODO: Remove the noexcept from the API's and SDK's GetLogger(~)
+    throw std::length_error("Number of loggers exceeds max count");
+#else
+    std::terminate();
+#endif
+  }
+
+  // If no logger with that name exists yet, create it and add it to the map of loggers
   auto loggerInstance = new Logger(GetProcessor());
   std::shared_ptr<Logger> loggerPtr{loggerInstance};
   loggers_[name.data()] = loggerPtr;
@@ -53,23 +66,6 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
 {
   // Currently, no args support
   return GetLogger(name);
-}
-
-bool LoggerProvider::RemoveLogger(std::string name) noexcept
-{
-  // Search if a logger with the given name already exists.
-  // If so, set it to a Noop logger and remove it from list of loggers
-  std::unordered_map<std::string, std::shared_ptr<Logger>>::iterator loggerkv = loggers_.find(name);
-  if (loggerkv != loggers_.end())
-  {
-    // TODO: Test this functionality
-    std::shared_ptr<opentelemetry::logs::Logger> apilogger = loggerkv->second;
-    apilogger.reset(new opentelemetry::logs::NoopLogger);
-    loggers_.erase(name);
-    return true;
-  }
-
-  return false;
 }
 
 std::shared_ptr<LogProcessor> LoggerProvider::GetProcessor() noexcept

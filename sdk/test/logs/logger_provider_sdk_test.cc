@@ -20,6 +20,7 @@
 #include "opentelemetry/sdk/logs/logger_provider.h"
 
 #include <gtest/gtest.h>
+#include <pthread.h>
 
 using namespace opentelemetry::sdk::logs;
 
@@ -66,7 +67,7 @@ TEST(LoggerProviderSDK, LoggerProviderProcessor)
   ASSERT_EQ(lp.GetProcessor(), nullptr);
 
   // Check that processor Logger::log() behavior is defined even when there is no processor set
-  Logger logger;
+  Logger logger(nullptr);
   opentelemetry::logs::LogRecord r;
   r.name = "Test log";
   logger.log(r);  // may not be a reliable check as calling processor->OnReceive() where processor
@@ -76,4 +77,19 @@ TEST(LoggerProviderSDK, LoggerProviderProcessor)
   std::shared_ptr<LogProcessor> proc = std::shared_ptr<LogProcessor>(new DummyProcessor());
   lp.SetProcessor(proc);
   ASSERT_EQ(proc, lp.GetProcessor());
+}
+
+TEST(LoggerProviderSDK, LoggerProviderMaxLoggers)
+{
+  // TODO: Remove the noexcept from the API's and SDK's GetLogger(~)
+
+#if __EXCEPTIONS
+  // Create more loggers than the LoggerProvider can register
+  // LoggerProvider lp;
+  // for(int i = 0; i < MAX_LOGGER_COUNT; i++)
+  // {
+  //  lp.GetLogger(std::to_string(i));
+  // }
+  // ASSERT_ANY_THROW(lp.GetLogger("NewLogger"));
+#endif
 }

@@ -35,11 +35,6 @@ class Logger final : public opentelemetry::logs::Logger, public std::enable_shar
 {
 public:
   /**
-   * Initialize a new logger.
-   */
-  explicit Logger() noexcept;
-
-  /**
    * Initialize a new logger and pass it a processor.
    * @param processor The processor for this logger.
    */

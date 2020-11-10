@@ -21,8 +21,6 @@ namespace sdk
 {
 namespace logs
 {
-Logger::Logger() noexcept : processor_{nullptr} {}
-
 Logger::Logger(std::shared_ptr<LogProcessor> processor) noexcept : processor_{processor} {}
 
 void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
