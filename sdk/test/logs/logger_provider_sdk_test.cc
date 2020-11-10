@@ -20,7 +20,6 @@
 #include "opentelemetry/sdk/logs/logger_provider.h"
 
 #include <gtest/gtest.h>
-#include <pthread.h>
 
 using namespace opentelemetry::sdk::logs;
 
