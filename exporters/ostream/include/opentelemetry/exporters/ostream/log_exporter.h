@@ -10,9 +10,11 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+// #include<nlohmann/json.hpp>
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
+// using json = nlohmann::json;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -20,7 +22,7 @@ namespace exporter
 namespace logs
 {
 /**
- * The OStreamSpanExporter exports logs through an ostream to JSON format
+ * The OStreamLogExporter exports logs through an ostream to JSON format
  */
 class OStreamLogExporter final : public sdklogs::LogExporter
 {
@@ -40,28 +42,38 @@ private:
   std::ostream &sout_;
   bool isShutdown_ = false;
   bool firstLog    = true;
-  /*!
-   From:
-   https://github.com/nlohmann/json/blob/ec7a1d834773f9fee90d8ae908a0c9933c5646fc/src/json.hpp#L4604-L4697
-   Can use a dependency on this library?
-   */
 
-  void printBody(const nostd::string_view &body)
-  {
-    // TODO
-    sout_ << "\"" << body << "\"";
-  }
+  // void printBody(const nostd::string_view &body)
+  // {
+  //   // TODO
+  //   sout_ << "\"" << body << "\"";
+  // }
 
-  void printKVI(const common::KeyValueIterable &attr)
-  {
-    sout_ << "[";
+  // void printKVI(const common::KeyValueIterable &attr)
+  // {
+  //   sout_ << "[";
     
     
-    sout_ << "]";
-  }
+  //   sout_ << "]";
+  // }
 
   void printRecord(const std::unique_ptr<opentelemetry::logs::LogRecord> &record)
   {
+    // Convert LogRecord to a JSON object 
+    /*
+    json log; 
+    log["timestamp"] =  record->timestamp.time_since_epoch().count();
+    log["severity"] =  record->severity; 
+    log["name"] =  record->name;
+    // log["body"] =  record->body;
+    // log["resource"] =  record->resource;
+    // log["attributes"] =  record->attributes;
+    log["traceid"] =  record->traceid;
+    log["spanid"] =  record->spanid;
+    log["traceflags"] =  record->traceflags;
+    
+    // pretty print with indentation of 4 spaces
+    sout_ << */
     if (firstLog)
     {
       sout_ << "[";
@@ -97,6 +109,7 @@ private:
 
     sout_ << "\n   }";  // end of log record
   }
+  
 };
 }  // namespace logs
 }  // namespace exporter
