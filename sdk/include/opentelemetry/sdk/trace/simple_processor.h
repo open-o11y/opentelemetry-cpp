@@ -45,8 +45,7 @@ public:
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     if (exporter_->Export(batch) == ExportResult::kFailure)
     {
-      /* Once it is defined how the SDK does logging, an error should be
-       * logged in this case. */
+      /* TODO: Alert user than an error has occured */
     }
   }
 

@@ -70,8 +70,8 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 class DummyProcessor : public LogProcessor
 {
   void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
-  void ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
+  ProcessorResult ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
+  ProcessorResult Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 };
 
 TEST(LoggerProviderSDK, GetAndSetProcessor)

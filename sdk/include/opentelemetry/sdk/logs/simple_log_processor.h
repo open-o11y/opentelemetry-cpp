@@ -40,23 +40,23 @@ class SimpleLogProcessor : public LogProcessor
 {
 
 public:
-  /**
-   * Initialize a simple log processor.
-   * @param exporter the exporter used by the log processor
-   */
-  // Constructor and destructor
+  
   explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter);
   virtual ~SimpleLogProcessor() = default;
 
-  // Overloaded methods from base LogProcessor class
   void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override;
-  void ForceFlush(
+
+  ProcessorResult ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  
+  ProcessorResult Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
+  // The configured exporter 
   std::unique_ptr<LogExporter> exporter_;
+  // The lock used to ensure the exporter is not called concurrently
   opentelemetry::common::SpinLockMutex lock_;
+  // The atomic boolean flag to ensure the ShutDown() function is only called once
   std::atomic_flag shutdown_latch_{ATOMIC_FLAG_INIT};
 };
 }  // namespace logs
