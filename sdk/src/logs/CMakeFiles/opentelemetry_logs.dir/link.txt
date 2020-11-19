@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libopentelemetry_logs.a CMakeFiles/opentelemetry_logs.dir/logger_provider.cc.o CMakeFiles/opentelemetry_logs.dir/logger.cc.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libopentelemetry_logs.a

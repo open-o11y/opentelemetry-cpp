@@ -1,0 +1,18 @@
+# CMake generated Testfile for 
+# Source directory: /Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs
+# Build directory: /Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+add_test(logs.LoggerProviderSDK.PushToAPI "/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/logger_provider_sdk_test" "--gtest_filter=LoggerProviderSDK.PushToAPI")
+set_tests_properties(logs.LoggerProviderSDK.PushToAPI PROPERTIES  _BACKTRACE_TRIPLES "/usr/local/Cellar/cmake/3.18.2/share/cmake/Modules/GoogleTest.cmake;378;add_test;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;5;gtest_add_tests;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;0;")
+add_test(logs.LoggerProviderSDK.LoggerProviderGetLoggerSimple "/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/logger_provider_sdk_test" "--gtest_filter=LoggerProviderSDK.LoggerProviderGetLoggerSimple")
+set_tests_properties(logs.LoggerProviderSDK.LoggerProviderGetLoggerSimple PROPERTIES  _BACKTRACE_TRIPLES "/usr/local/Cellar/cmake/3.18.2/share/cmake/Modules/GoogleTest.cmake;378;add_test;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;5;gtest_add_tests;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;0;")
+add_test(logs.LoggerProviderSDK.LoggerProviderLoggerArguments "/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/logger_provider_sdk_test" "--gtest_filter=LoggerProviderSDK.LoggerProviderLoggerArguments")
+set_tests_properties(logs.LoggerProviderSDK.LoggerProviderLoggerArguments PROPERTIES  _BACKTRACE_TRIPLES "/usr/local/Cellar/cmake/3.18.2/share/cmake/Modules/GoogleTest.cmake;378;add_test;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;5;gtest_add_tests;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;0;")
+add_test(logs.LoggerProviderSDK.GetAndSetProcessor "/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/logger_provider_sdk_test" "--gtest_filter=LoggerProviderSDK.GetAndSetProcessor")
+set_tests_properties(logs.LoggerProviderSDK.GetAndSetProcessor PROPERTIES  _BACKTRACE_TRIPLES "/usr/local/Cellar/cmake/3.18.2/share/cmake/Modules/GoogleTest.cmake;378;add_test;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;5;gtest_add_tests;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;0;")
+add_test(logs.LoggerSDK.LogToNullProcessor "/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/logger_sdk_test" "--gtest_filter=LoggerSDK.LogToNullProcessor")
+set_tests_properties(logs.LoggerSDK.LogToNullProcessor PROPERTIES  _BACKTRACE_TRIPLES "/usr/local/Cellar/cmake/3.18.2/share/cmake/Modules/GoogleTest.cmake;378;add_test;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;5;gtest_add_tests;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;0;")
+add_test(logs.LoggerSDK.LogToAProcessor "/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/logger_sdk_test" "--gtest_filter=LoggerSDK.LogToAProcessor")
+set_tests_properties(logs.LoggerSDK.LogToAProcessor PROPERTIES  _BACKTRACE_TRIPLES "/usr/local/Cellar/cmake/3.18.2/share/cmake/Modules/GoogleTest.cmake;378;add_test;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;5;gtest_add_tests;/Users/mseufert/Documents/opentelemetry-cpp-ES-exporter/sdk/test/logs/CMakeLists.txt;0;")
