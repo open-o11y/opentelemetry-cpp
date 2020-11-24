@@ -54,6 +54,32 @@ TEST(Logger, LogMethod)
   logger->Log(r);
 }
 
+TEST(Logger, LogRecordDefaults)
+{
+  auto r      = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
+
+  // Check that the timestamp is set to 0 by default
+  ASSERT_EQ(r->timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
+
+  // Check that the severity is set to kDefault by default
+  ASSERT_EQ(r->severity, Severity::kDefault);
+
+  // Check that trace_id is set to all zeros by default
+  char trace_buf[32];
+  r->trace_id.ToLowerBase16(trace_buf);
+  ASSERT_EQ(std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000");
+
+  // Check that span_id is set to all zeros by default
+  char span_buf[16];
+  r->span_id.ToLowerBase16(span_buf);
+  ASSERT_EQ(std::string(span_buf, sizeof(span_buf)), "0000000000000000");
+
+  // Check that trace_flags is set to all zeros by default
+  char flags_buf[2];
+  r->trace_flag.ToLowerBase16(flags_buf);
+  ASSERT_EQ(std::string(flags_buf, sizeof(flags_buf)), "00");
+}
+
 // Define a basic Logger class
 class TestLogger : public Logger
 {
