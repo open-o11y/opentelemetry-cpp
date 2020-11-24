@@ -21,9 +21,30 @@ sdklogs::ExportResult OStreamLogExporter::Export(
   }
 
   // print records
-  for (auto &r : records)
+  for (auto &record : records)
   {
-    printRecord(r);
+    if (firstLog)
+    {
+      firstLog = false;
+    }
+    else
+    {
+      sout_ << ",\n";  // comma for previous log record
+    }
+    // Convert LogRecord to a JSON object
+    json log;
+    log["timestamp"] =  record->timestamp.time_since_epoch().count();
+    log["severity"] =  record->severity;
+    log["name"] =  record->name;
+    log["body"] =  record->body;
+    // log["resource"] =  record->resource;
+    // log["attributes"] =  record->attributes;
+    // log["trace_id"] =  record->trace_id;
+    // log["span_id"] =  record->span_id;
+    // log["trace_flag"] =  record->trace_flag;
+
+    // pretty print with indentation of 4 spaces
+    sout_ << log.dump(4);
   }
 
   return sdklogs::ExportResult::kSuccess;
@@ -31,9 +52,9 @@ sdklogs::ExportResult OStreamLogExporter::Export(
 
 void OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  isShutdown_ = true;
+  sout_ << "\n"; // print newline for final log record
 
-  sout_ << "]\n";
+  isShutdown_ = true;
 }
 
 }  // namespace logs

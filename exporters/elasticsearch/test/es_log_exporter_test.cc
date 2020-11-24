@@ -11,7 +11,7 @@ namespace nostd    = opentelemetry::nostd;
 
 // TBD
 TEST(ElasticsearchLogsExporter, PrintEmpty) {
-    
+
 }
 TEST(ElasticsearchLogsExporter, PrintTimestamp) {}
 TEST(ElasticsearchLogsExporter, PrintTraceFlags) {}

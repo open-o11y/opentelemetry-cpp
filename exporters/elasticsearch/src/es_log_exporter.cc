@@ -61,10 +61,10 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
   for (auto &r : records)
   {
-    // Convert LogRecord to a JSON object 
-    json log; 
+    // Convert LogRecord to a JSON object
+    json log;
     log["timestamp"] =  record->timestamp.time_since_epoch().count();
-    log["severity"] =  record->severity; 
+    log["severity"] =  record->severity;
     log["name"] =  record->name;
     log["body"] =  record->body;
     log["resource"] =  record->resource;
@@ -74,11 +74,11 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     log["traceflags"] =  record->traceflags;
     logs.emplace_back(log);
 
-    // for debugging 
+    // for debugging
     cout << log.dump(4) << "\n";
   }
 
-  // Send JSON object in HTTP request to elasticsearch here 
+  // Send JSON object in HTTP request to elasticsearch here
 
   opentelemetry::ext::http::client::curl::SessionManager session_manager;
 
@@ -103,7 +103,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   "}";
   std::vector<uint8_t> body_vec(str_body.begin(), str_body.end());
   request->SetBody(body_vec);
-  
+
   //Send the request
   PostEventHandler *handler = new PostEventHandler();
   std::cout << "Sending request" << std::endl;

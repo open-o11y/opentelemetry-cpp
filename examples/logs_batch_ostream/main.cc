@@ -16,24 +16,20 @@ void initLogger()
 {
   auto exporter =
       std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
-
   // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
-
   // We make the queue size `kNumLogs`*2+5 because when the queue is half full, a preemptive notif
   // is sent to start an export call, which we want to avoid in this simple example.
   const size_t max_queue_size = kNumLogs * 2 + 5;
-
   // Time interval (in ms) between two consecutive exports.
   const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(3000);
-
   // We export `kNumLogs` after every `schedule_delay_millis` milliseconds.
   const size_t max_export_batch_size = kNumLogs;
-
   auto processor = std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::BatchLogProcessor(
       std::move(exporter), max_queue_size, schedule_delay_millis, max_export_batch_size));
-
-  auto provider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(
-      new sdklogs::LoggerProvider(processor));
+  auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
+  sdkProvider->SetProcessor(processor);
+  auto apiProvider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(sdkProvider);
+  auto provider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(apiProvider);
   // Set the global logger provider.
   opentelemetry::logs::Provider::SetLoggerProvider(provider);
 }
