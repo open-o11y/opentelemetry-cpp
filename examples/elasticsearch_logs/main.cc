@@ -26,8 +26,8 @@ void initLogger()
   // Set the global logs provider
   // logs_api::Provider::SetLoggerProvider(provider);
 
-  sdklogs::LoggerProvider lp; 
-  lp.SetProcessor(processor); 
+  sdklogs::LoggerProvider lp;
+  lp.SetProcessor(processor);
 }
 
 nostd::shared_ptr<opentelemetry::logs::Logger> get_logger()
@@ -51,9 +51,9 @@ int main()
 {
   // Removing this line will leave the default noop LoggerProvider in place.
   initLogger();
-  
+
 
   // Send kNumLogs to exporter
-  const int kNumLogs = 5; 
+  const int kNumLogs = 5;
   CreateLogs(kNumLogs);
 }

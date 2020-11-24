@@ -72,15 +72,15 @@ public:
 
   /**
    * Shuts down the processor and does any cleanup required.
-   * Any subsequent calls to OnReceive, ForceFlush or Shutdown 
+   * Any subsequent calls to OnReceive, ForceFlush or Shutdown
    * will return immediately without doing anything.
    * NOTE: Timeout functionality not supported yet.
    */
   void Shutdown(std::chrono::microseconds timeout = std::chrono::milliseconds(0)) noexcept override;
 
   /**
-   * The Shutdown() method is supposed to be invoked by this class destructor  
-   * (as per other languages), but the C++ Logger has shared ownership 
+   * The Shutdown() method is supposed to be invoked by this class destructor
+   * (as per other languages), but the C++ Logger has shared ownership
    * of the processor with other Loggers so the processor will not be shutdown.
    */
   ~BatchLogProcessor();
