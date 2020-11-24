@@ -34,7 +34,7 @@ class LogProcessor
 public:
   virtual ~LogProcessor() = default;
 
-  virtual void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept = 0;
+  virtual void OnReceive(nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept = 0;
 
   virtual void ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
