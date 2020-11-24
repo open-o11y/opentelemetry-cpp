@@ -99,8 +99,10 @@ struct LogRecord
    **/
   LogRecord() : resource(_nullKV), attributes(_nullKV)
   {
-    // TODO: in SDK, assign a default timestamp if not specified
-    name = "";
+    // Assign default values
+    timestamp = core::SystemTimestamp(std::chrono::seconds(0));
+    severity = Severity::kDefault;
+    
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
