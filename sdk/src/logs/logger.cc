@@ -41,17 +41,15 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   }
 
   // TODO: Sampler logic (should include check for minSeverity)
-  auto record_pointer = std::unique_ptr<opentelemetry::logs::LogRecord>(
-      new opentelemetry::logs::LogRecord(*record.get()));
   // TODO: Do not want to overwrite user-set timestamp if there already is one -
   // add a flag in the API to check if timestamp is set by user already before setting timestamp
 
   // Inject timestamp if none is set
-  record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  record->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
   // TODO: inject traceid/spanid later
 
   // Send the log record to the processor
-  processor->OnReceive(std::move(record_pointer));
+  processor->OnReceive(record);
 }
 
 }  // namespace logs

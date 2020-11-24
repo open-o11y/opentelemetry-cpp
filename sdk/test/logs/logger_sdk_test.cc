@@ -47,7 +47,7 @@ TEST(LoggerSDK, LogToNullProcessor)
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
+  void OnReceive(std::shared_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
     return true;
