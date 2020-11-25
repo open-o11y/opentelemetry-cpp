@@ -101,8 +101,7 @@ struct LogRecord
   {
     // Assign default values
     timestamp = core::SystemTimestamp(std::chrono::seconds(0));
-    severity = Severity::kDefault;
-    
+    severity  = Severity::kDefault;
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the

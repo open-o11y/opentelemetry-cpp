@@ -51,28 +51,28 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   char trace_buf[32];
   record->trace_id.ToLowerBase16(trace_buf);
   if (std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000")
-  { 
-    //TODO
+  {
+    // TODO
   }
 
   // Spanid
   char span_buf[16];
   record->span_id.ToLowerBase16(span_buf);
   if (std::string(span_buf, sizeof(span_buf)), "0000000000000000")
-  { 
-    //TODO
+  {
+    // TODO
   }
 
   // Traceflag
   char flag_buf[2];
   record->trace_flag.ToLowerBase16(flag_buf);
   if (std::string(flag_buf, sizeof(flag_buf)), "00")
-  { 
-    //TODO
+  {
+    // TODO
   }
-  
+
   // Inject logger name into record
-  
+
   // TODO: inject traceid/spanid later
 
   // Send the log record to the processor

@@ -69,7 +69,8 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept {}
+  void OnReceive(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
+  {}
   void ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 };
@@ -84,4 +85,20 @@ TEST(LoggerProviderSDK, GetAndSetProcessor)
   std::shared_ptr<LogProcessor> proc2 = std::shared_ptr<LogProcessor>(new DummyProcessor());
   lp.SetProcessor(proc2);
   ASSERT_EQ(proc2, lp.GetProcessor());
+}
+
+TEST(LoggerProviderSDK, LoggerLimit)
+{
+  auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+
+  // Create as many loggers as the logger provider allows
+  for (int i = 0; i < OTEL_MAX_LOGGER_COUNT; i++)
+  {
+    lp->GetLogger(std::to_string(i));
+  }
+
+  // Creating a new logger will return a noop logger
+  auto logger = lp->GetLogger("Another logger");
+  opentelemetry::logs::NoopLogger nooplogger;
+  ASSERT_EQ(logger->GetName(), nooplogger.GetName());
 }

@@ -47,7 +47,8 @@ TEST(LoggerSDK, LogToNullProcessor)
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept {}
+  void OnReceive(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
+  {}
   void ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 };
@@ -57,7 +58,7 @@ TEST(LoggerSDK, DefaultValueInjection)
   // In order to test value injection, the processor must not be nullptr
   // A DummyProcessor was created above to satisfy this requirement
   std::shared_ptr<LogProcessor> processor = std::shared_ptr<LogProcessor>(new DummyProcessor());
-  auto lp     = std::shared_ptr<LoggerProvider>(new LoggerProvider());
+  auto lp                                 = std::shared_ptr<LoggerProvider>(new LoggerProvider());
   lp->SetProcessor(processor);
   auto logger = lp->GetLogger("Logger1");
 

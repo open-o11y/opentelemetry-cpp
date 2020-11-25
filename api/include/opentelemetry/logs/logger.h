@@ -70,13 +70,13 @@ public:
   inline void Log(Severity severity, nostd::string_view message) noexcept
   {
     // TODO: set default timestamp later (not in API)
-    //Log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
+    // Log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
 
     // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    auto r       = nostd::shared_ptr<LogRecord>(new LogRecord);
-    r->severity  = severity;
-    r->body      = message;
-   
+    auto r      = nostd::shared_ptr<LogRecord>(new LogRecord);
+    r->severity = severity;
+    r->body     = message;
+
     Log(r);
   }
 
