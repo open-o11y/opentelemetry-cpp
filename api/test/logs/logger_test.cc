@@ -56,7 +56,7 @@ TEST(Logger, LogMethod)
 
 TEST(Logger, LogRecordDefaults)
 {
-  auto r      = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
+  auto r = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
 
   // Check that the timestamp is set to 0 by default
   ASSERT_EQ(r->timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));

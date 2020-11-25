@@ -63,7 +63,7 @@ TEST(LoggerSDK, DefaultValueInjection)
   // In order to test value injection, the processor must not be nullptr
   // A DummyProcessor was created above to satisfy this requirement
   std::shared_ptr<LogProcessor> processor = std::shared_ptr<LogProcessor>(new DummyProcessor());
-  auto lp     = std::shared_ptr<LoggerProvider>(new LoggerProvider());
+  auto lp                                 = std::shared_ptr<LoggerProvider>(new LoggerProvider());
   lp->SetProcessor(processor);
   auto logger = lp->GetLogger("Logger1");
 

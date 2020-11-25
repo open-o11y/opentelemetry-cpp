@@ -91,3 +91,19 @@ TEST(LoggerProviderSDK, GetAndSetProcessor)
   lp.SetProcessor(proc2);
   ASSERT_EQ(proc2, lp.GetProcessor());
 }
+
+TEST(LoggerProviderSDK, LoggerLimit)
+{
+  auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+
+  // Create as many loggers as the logger provider allows
+  for (int i = 0; i < OTEL_MAX_LOGGER_COUNT; i++)
+  {
+    lp->GetLogger(std::to_string(i));
+  }
+
+  // Creating a new logger will return a noop logger
+  auto logger = lp->GetLogger("Another logger");
+  opentelemetry::logs::NoopLogger nooplogger;
+  ASSERT_EQ(logger->GetName(), nooplogger.GetName());
+}
