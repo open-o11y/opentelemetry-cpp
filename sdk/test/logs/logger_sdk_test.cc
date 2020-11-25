@@ -52,30 +52,24 @@ class DummyProcessor : public LogProcessor
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 };
 
-TEST(LoggerSDK, LogToAProcessor)
+TEST(LoggerSDK, DefaultValueInjection)
 {
-  // Create an API LoggerProvider and logger
-  auto api_lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
-  auto logger = api_lp->GetLogger("logger");
-
-  // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
-  // LoggerProvider by checking that getting a logger with the same name as the previously defined
-  // logger is the same instance
-  auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger");
-  ASSERT_EQ(logger, logger2);
-
-  // Set a processor for the LoggerProvider
+  // In order to test value injection, the processor must not be nullptr
+  // A DummyProcessor was created above to satisfy this requirement
   std::shared_ptr<LogProcessor> processor = std::shared_ptr<LogProcessor>(new DummyProcessor());
+  auto lp     = std::shared_ptr<LoggerProvider>(new LoggerProvider());
   lp->SetProcessor(processor);
-  ASSERT_EQ(processor, lp->GetProcessor());
-
-  // Should later introduce a way to assert that
-  // the logger's processor is the same as "proc"
-  // and that the logger's processor is the same as lp's processor
+  auto logger = lp->GetLogger("Logger1");
 
   // Log a sample log record to the processor
   auto r  = std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord);
   r->name = "Test log";
   logger->Log(r);
+
+  // Check that the log record has injected values
+
+  // Timestamp shouldn't equal 0
+  ASSERT_NE(r->timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
+
+  // TODO: Add checks for traceid, spanid, and traceflags once it gets added
 }
