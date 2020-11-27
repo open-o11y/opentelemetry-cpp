@@ -20,7 +20,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     return sdklogs::ExportResult::kFailure;
   }
 
-  // print records
+  // print each log record
   for (auto &record : records)
   {
     if (firstLog)
@@ -32,16 +32,25 @@ sdklogs::ExportResult OStreamLogExporter::Export(
       sout_ << ",\n";  // comma for previous log record
     }
     // Convert LogRecord to a JSON object
-    json log;
+    ordered_json log; // optionally instead "json log;"
     log["timestamp"] =  record->timestamp.time_since_epoch().count();
     log["severity"] =  record->severity;
     log["name"] =  record->name;
     log["body"] =  record->body;
     // log["resource"] =  record->resource;
     // log["attributes"] =  record->attributes;
-    // log["trace_id"] =  record->trace_id;
-    // log["span_id"] =  record->span_id;
-    // log["trace_flag"] =  record->trace_flag;
+
+    char trace_id[32]       = {0};
+    record->trace_id.ToLowerBase16(trace_id);
+    log["trace_id"] =  std::string(trace_id, 32); // TODO: not a string
+
+    char span_id[16]       = {0};
+    record->span_id.ToLowerBase16(span_id);
+    log["span_id"] =  std::string(span_id, 16); // TODO: not a string
+
+    char trace_flag[2] = {0};
+    record->trace_flag.ToLowerBase16(trace_flag);
+    log["trace_flag"] = trace_flag;
 
     // pretty print with indentation of 4 spaces
     sout_ << log.dump(4);
