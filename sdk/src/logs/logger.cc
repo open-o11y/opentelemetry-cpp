@@ -15,6 +15,8 @@
  */
 
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -47,9 +49,16 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: Do not want to overwrite user-set timestamp if there already is one -
   // add a flag in the API to check if timestamp is set by user already before setting timestamp
 
-  // Inject timestamp if none is set
+  // Inject timestamp (if none is set)
   record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
-  // TODO: inject traceid/spanid later
+
+  // Inject traceid/spanid (if none is set)
+  auto provider = opentelemetry::trace::Provider::GetTracerProvider();
+  auto tracer = provider->GetTracer("foo_library");
+  auto span_context = tracer->GetCurrentSpan()->GetContext();
+  record_pointer->trace_id = span_context.trace_id(); 
+  record_pointer->span_id = span_context.span_id(); 
+  record_pointer->trace_flag = span_context.trace_flags();
 
   // Send the log record to the processor
   processor->OnReceive(std::move(record_pointer));
