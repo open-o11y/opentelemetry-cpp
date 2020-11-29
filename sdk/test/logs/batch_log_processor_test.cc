@@ -56,12 +56,7 @@ public:
 
     for (auto &record : records)
     {
-      auto log = std::unique_ptr<LogRecord>(record.release());
-      if (log != nullptr)
-      {
-        // log->name = record->name;
-        logs_received_->push_back(std::move(log));
-      }
+      logs_received_->push_back(std::move(record));
     }
 
     *is_export_completed_ = true;
