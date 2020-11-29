@@ -56,10 +56,10 @@ public:
 
     for (auto &record : records)
     {
-      auto log = std::unique_ptr<LogRecord>(static_cast<LogRecord *>(record.get()));
+      auto log = std::unique_ptr<LogRecord>(record.release());
       if (log != nullptr)
       {
-        log->name = record->name;
+        // log->name = record->name;
         logs_received_->push_back(std::move(log));
       }
     }
