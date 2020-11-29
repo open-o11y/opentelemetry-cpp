@@ -56,7 +56,12 @@ public:
 
     for (auto &record : records)
     {
-      logs_received_->push_back(std::move(record));
+      auto log = std::unique_ptr<LogRecord>(record.release());
+      if (log != nullptr)
+      {
+        // log->name = record->name;
+        logs_received_->push_back(std::move(log));
+      }
     }
 
     *is_export_completed_ = true;
@@ -114,11 +119,10 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
     std::unique_ptr<LogRecord> record(new LogRecord());
 
     std::string s("Log ");
-    // s += std::to_string(i);
-    // const char * c = s.c_str();
-    // opentelemetry::nostd::string_view sv(s);
-
-    record->name = s;
+    s += std::to_string(i);
+    const char * c = s.data(); 
+    // opentelemetry::nostd::string_view sv(c);
+    record->name = c;
 
     batch_processor->OnReceive(std::move(record));
   }
@@ -134,10 +138,9 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   for (int i = 0; i < num_logs; ++i)
   {
     std::string s("Log ");
-    // s += std::to_string(i);
-    // const char *c = s.c_str();
+    s += std::to_string(i);
     opentelemetry::nostd::string_view sv(s);
-    // EXPECT_EQ(sv, logs_received->at(i)->name.data());
+    EXPECT_EQ(s.data(), logs_received->at(i)->name.data());
   }
 
   // Also check that the processor is shut down at the end
