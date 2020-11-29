@@ -114,17 +114,19 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   // create a few test log records and send them to the processor
   const int num_logs = 3;
 
+  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < num_logs; ++i)
   {
-    std::unique_ptr<LogRecord> record(new LogRecord());
-
+    LogRecord record;
     std::string s("Log ");
     s += std::to_string(i);
-    const char * c = s.data(); 
-    // opentelemetry::nostd::string_view sv(c);
-    record->name = c;
+    record.name = s;
 
-    batch_processor->OnReceive(std::move(record));
+    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    batch_processor->OnReceive(std::move(log));
+
+    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
+    test_logs.push_back(std::move(log_copy));
   }
 
   // Test that shutting down the processor will first wait for the
@@ -137,10 +139,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   // Assume logs are received by exporter in same order as sent by processor
   for (int i = 0; i < num_logs; ++i)
   {
-    std::string s("Log ");
-    s += std::to_string(i);
-    opentelemetry::nostd::string_view sv(s);
-    EXPECT_EQ(s.data(), logs_received->at(i)->name.data());
+    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
   }
 
   // Also check that the processor is shut down at the end
@@ -156,16 +155,19 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
   const int num_logs   = 2048;
 
+  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < num_logs; ++i)
   {
-    std::unique_ptr<LogRecord> record(new LogRecord());
-
+    LogRecord record;
     std::string s("Log ");
     s += std::to_string(i);
-    record->name = s;
-    EXPECT_EQ(s, record->name);
+    record.name = s;
 
-    batch_processor->OnReceive(std::move(record));
+    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    batch_processor->OnReceive(std::move(log));
+
+    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
+    test_logs.push_back(std::move(log_copy));
   }
 
   // Give some time to export
@@ -176,22 +178,22 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
   {
-    std::string orig_name("Log ");
-    orig_name += std::to_string(i);
-    // EXPECT_EQ(orig_name, logs_received->at(i)->name.data());
+    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
   }
 
   // Create some more logs to make sure that the processor still works
   for (int i = 0; i < num_logs; ++i)
   {
-    std::unique_ptr<LogRecord> record(new LogRecord());
-
+    LogRecord record;
     std::string s("Log ");
-    s += std::to_string(i);
-    record->name = s;
-    EXPECT_EQ(s, record->name);
+    s += std::to_string(num_logs + i);
+    record.name = s;
 
-    batch_processor->OnReceive(std::move(record));
+    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    batch_processor->OnReceive(std::move(log));
+
+    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
+    test_logs.push_back(std::move(log_copy));
   }
 
   // Give some time to export the logs
@@ -200,11 +202,9 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   batch_processor->ForceFlush();
 
   EXPECT_EQ(num_logs * 2, logs_received->size());
-  for (int i = 0; i < num_logs; ++i)
+  for (int i = 0; i < num_logs * 2; ++i)
   {
-    std::string s("Log ");
-    s += std::to_string(i % num_logs);
-    // EXPECT_EQ(s, logs_received->at(i)->name.data());
+    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
   }
 }
 
@@ -221,16 +221,16 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
 
   // Create max_queue_size log records
+  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < max_queue_size; ++i)
   {
-    std::unique_ptr<LogRecord> record(new LogRecord());
-
+    LogRecord record;
     std::string s("Log ");
     s += std::to_string(i);
-    record->name = s;
-    EXPECT_EQ(s, record->name);
+    record.name = s;
 
-    batch_processor->OnReceive(std::move(record));
+    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    batch_processor->OnReceive(std::move(log));
   }
 
   // Give some time to export the logs
@@ -253,17 +253,21 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
 
   const int num_logs = 2048;
 
+  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < num_logs; ++i)
   {
-    std::unique_ptr<LogRecord> record(new LogRecord());
-
+    LogRecord record;
     std::string s("Log ");
     s += std::to_string(i);
-    record->name = s;
-    EXPECT_EQ(s, record->name);
+    record.name = s;
 
-    batch_processor->OnReceive(std::move(record));
+    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    batch_processor->OnReceive(std::move(log));
+
+    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
+    test_logs.push_back(std::move(log_copy));
   }
+
   // Give some time to export the logs
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
@@ -272,9 +276,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
   {
-    std::string s("Log ");
-    s += std::to_string(i);
-    // EXPECT_EQ(s, logs_received->at(i)->name.data());
+    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
   }
 }
 
@@ -295,18 +297,20 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown, is_export_completed,
                                           export_delay, schedule_delay_millis);
 
+  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < max_export_batch_size; ++i)
   {
-    std::unique_ptr<LogRecord> record(new LogRecord());
-
+    LogRecord record;
     std::string s("Log ");
     s += std::to_string(i);
-    record->name = s;
-    EXPECT_EQ(s, record->name);
+    record.name = s;
 
-    batch_processor->OnReceive(std::move(record));
+    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    batch_processor->OnReceive(std::move(log));
+
+    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
+    test_logs.push_back(std::move(log_copy));
   }
-
   // Sleep for schedule_delay_millis milliseconds
   std::this_thread::sleep_for(schedule_delay_millis);
 
@@ -318,8 +322,6 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   EXPECT_EQ(max_export_batch_size, logs_received->size());
   for (size_t i = 0; i < max_export_batch_size; ++i)
   {
-    std::string s("Log ");
-    s += std::to_string(i);
-    // EXPECT_EQ(s, logs_received->at(i)->name.data());
+    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
   }
 }
