@@ -31,13 +31,13 @@ using opentelemetry::logs::LogRecord;
 class TestLogExporter final : public LogExporter
 {
 private:
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received_;
+  std::shared_ptr<std::vector<std::string>> logs_received_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   const std::chrono::milliseconds export_delay_;
 
 public:
-  TestLogExporter(std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
+  TestLogExporter(std::shared_ptr<std::vector<std::string>> logs_received,
                   std::shared_ptr<std::atomic<bool>> is_shutdown,
                   std::shared_ptr<std::atomic<bool>> is_export_completed,
                   const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
@@ -56,12 +56,7 @@ public:
 
     for (auto &record : records)
     {
-      auto log = std::unique_ptr<LogRecord>(record.release());
-      if (log != nullptr)
-      {
-        // log->name = record->name;
-        logs_received_->push_back(std::move(log));
-      }
+      logs_received_->push_back(record->name.data());
     }
 
     *is_export_completed_ = true;
@@ -86,7 +81,7 @@ public:
   // returns a batch log processor that received a batch of log records, a shared pointer to a
   // is_shutdown flag, and the processor configuration options (default if unspecified)
   std::shared_ptr<LogProcessor> GetTestProcessor(
-      std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
+      std::shared_ptr<std::vector<std::string>> logs_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
@@ -105,8 +100,7 @@ public:
 TEST_F(BatchLogProcessorTest, TestShutdown)
 {
   // initialize a batch log processor with the test exporter
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
 
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
@@ -114,19 +108,11 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   // create a few test log records and send them to the processor
   const int num_logs = 3;
 
-  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < num_logs; ++i)
   {
-    LogRecord record;
-    std::string s("Log ");
-    s += std::to_string(i);
-    record.name = s;
-
-    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    auto log  = std::unique_ptr<LogRecord>(new LogRecord());
+    log->name = "Log name";
     batch_processor->OnReceive(std::move(log));
-
-    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
-    test_logs.push_back(std::move(log_copy));
   }
 
   // Test that shutting down the processor will first wait for the
@@ -139,7 +125,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   // Assume logs are received by exporter in same order as sent by processor
   for (int i = 0; i < num_logs; ++i)
   {
-    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
+    EXPECT_EQ("Log name", logs_received->at(i));
   }
 
   // Also check that the processor is shut down at the end
@@ -149,25 +135,16 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
 TEST_F(BatchLogProcessorTest, TestForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
 
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
   const int num_logs   = 2048;
 
-  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < num_logs; ++i)
   {
-    LogRecord record;
-    std::string s("Log ");
-    s += std::to_string(i);
-    record.name = s;
-
-    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    auto log  = std::unique_ptr<LogRecord>(new LogRecord());
+    log->name = "Log name";
     batch_processor->OnReceive(std::move(log));
-
-    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
-    test_logs.push_back(std::move(log_copy));
   }
 
   // Give some time to export
@@ -178,22 +155,15 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
   {
-    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
+    EXPECT_EQ("Log name", logs_received->at(i));
   }
 
   // Create some more logs to make sure that the processor still works
   for (int i = 0; i < num_logs; ++i)
   {
-    LogRecord record;
-    std::string s("Log ");
-    s += std::to_string(num_logs + i);
-    record.name = s;
-
-    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    auto log  = std::unique_ptr<LogRecord>(new LogRecord());
+    log->name = "Log name";
     batch_processor->OnReceive(std::move(log));
-
-    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
-    test_logs.push_back(std::move(log_copy));
   }
 
   // Give some time to export the logs
@@ -204,7 +174,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   EXPECT_EQ(num_logs * 2, logs_received->size());
   for (int i = 0; i < num_logs * 2; ++i)
   {
-    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
+    EXPECT_EQ("Log name", logs_received->at(i));
   }
 }
 
@@ -213,23 +183,17 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
   /* Test that when exporting more than max_queue_size logs, some are most likely lost*/
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
 
   const int max_queue_size = 4096;
 
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
 
   // Create max_queue_size log records
-  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < max_queue_size; ++i)
   {
-    LogRecord record;
-    std::string s("Log ");
-    s += std::to_string(i);
-    record.name = s;
-
-    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    auto log  = std::unique_ptr<LogRecord>(new LogRecord());
+    log->name = "Log name";
     batch_processor->OnReceive(std::move(log));
   }
 
@@ -247,25 +211,16 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
   /* Test that no logs are lost when sending max_queue_size logs */
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
 
   const int num_logs = 2048;
 
-  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < num_logs; ++i)
   {
-    LogRecord record;
-    std::string s("Log ");
-    s += std::to_string(i);
-    record.name = s;
-
-    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    auto log  = std::unique_ptr<LogRecord>(new LogRecord());
+    log->name = "Log name";
     batch_processor->OnReceive(std::move(log));
-
-    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
-    test_logs.push_back(std::move(log_copy));
   }
 
   // Give some time to export the logs
@@ -276,7 +231,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
   {
-    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
+    EXPECT_EQ("Log name", logs_received->at(i));
   }
 }
 
@@ -287,8 +242,7 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
 
   const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds schedule_delay_millis(2000);
@@ -297,19 +251,11 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown, is_export_completed,
                                           export_delay, schedule_delay_millis);
 
-  std::vector<std::unique_ptr<LogRecord>> test_logs;
   for (int i = 0; i < max_export_batch_size; ++i)
   {
-    LogRecord record;
-    std::string s("Log ");
-    s += std::to_string(i);
-    record.name = s;
-
-    std::unique_ptr<LogRecord> log(new LogRecord(record));
+    auto log  = std::unique_ptr<LogRecord>(new LogRecord());
+    log->name = "Log name";
     batch_processor->OnReceive(std::move(log));
-
-    std::unique_ptr<LogRecord> log_copy(new LogRecord(record));
-    test_logs.push_back(std::move(log_copy));
   }
   // Sleep for schedule_delay_millis milliseconds
   std::this_thread::sleep_for(schedule_delay_millis);
@@ -322,6 +268,6 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   EXPECT_EQ(max_export_batch_size, logs_received->size());
   for (size_t i = 0; i < max_export_batch_size; ++i)
   {
-    EXPECT_EQ(test_logs.at(i)->name, logs_received->at(i)->name);
+    EXPECT_EQ("Log name", logs_received->at(i));
   }
 }

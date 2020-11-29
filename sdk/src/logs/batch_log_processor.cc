@@ -187,10 +187,10 @@ void BatchLogProcessor::DrainQueue()
 // Note: Timeout functionality is currently not implemented
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  // if (is_shutdown_.load() == true)
-  // {
-  //   return false;
-  // }
+  if (is_shutdown_.load() == true)
+  {
+    return false;
+  }
 
   is_shutdown_ = true;
 
