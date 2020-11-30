@@ -6,7 +6,7 @@ cc_binary(
     linkopts = ["-lpthread"],
     deps = [
         "//api",
-        "//exporters/elasticsearch:elasticsearch_log_exporter",
+        "//exporters/elasticsearch:es_log_exporter",
         "//sdk/src/logs",
     ],
 )
