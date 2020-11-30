@@ -23,14 +23,6 @@ sdklogs::ExportResult OStreamLogExporter::Export(
   // print each log record
   for (auto &record : records)
   {
-    if (firstLog)
-    {
-      firstLog = false;
-    }
-    else
-    {
-      sout_ << ",\n";  // comma for previous log record
-    }
     // Convert LogRecord to a JSON object
     ordered_json log; // optionally instead "json log;"
     log["timestamp"] =  record->timestamp.time_since_epoch().count();
@@ -42,18 +34,21 @@ sdklogs::ExportResult OStreamLogExporter::Export(
 
     char trace_id[32]       = {0};
     record->trace_id.ToLowerBase16(trace_id);
-    log["trace_id"] =  std::string(trace_id, 32); // TODO: not a string
+    // log["trace_id"] =  std::string(trace_id, 32);  
+    log["trace_id"] =  "";
 
     char span_id[16]       = {0};
     record->span_id.ToLowerBase16(span_id);
-    log["span_id"] =  std::string(span_id, 16); // TODO: not a string
+    // log["span_id"] =  std::string(span_id, 16);  
+    log["span_id"] =  "";
 
     char trace_flag[2] = {0};
     record->trace_flag.ToLowerBase16(trace_flag);
     log["trace_flag"] = trace_flag;
+    log["trace_flag"] = "";
 
     // pretty print with indentation of 4 spaces
-    sout_ << log.dump(4);
+    sout_ << log.dump(4) << "\n"; 
   }
 
   return sdklogs::ExportResult::kSuccess;
@@ -61,8 +56,6 @@ sdklogs::ExportResult OStreamLogExporter::Export(
 
 void OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  sout_ << "\n"; // print newline for final log record
-
   isShutdown_ = true;
 }
 

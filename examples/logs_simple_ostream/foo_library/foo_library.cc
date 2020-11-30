@@ -1,13 +1,13 @@
 #include "opentelemetry/logs/provider.h"
 
-namespace logs  = opentelemetry::logs;
+namespace logs_api  = opentelemetry::logs;
 namespace nostd = opentelemetry::nostd;
 using opentelemetry::logs::Severity;
 namespace
 {
-nostd::shared_ptr<logs::Logger> get_logger()
+nostd::shared_ptr<logs_api::Logger> get_logger()
 {
-  auto provider = logs::Provider::GetLoggerProvider();
+  auto provider = logs_api::Provider::GetLoggerProvider();
   return provider->GetLogger("foo_library");
 }
 
