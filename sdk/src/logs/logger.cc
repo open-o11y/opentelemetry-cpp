@@ -42,7 +42,7 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
    * converting record a heap variable can be removed
    */
   auto record_pointer =
-      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+      std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
 
   // TODO: Do not want to overwrite user-set timestamp if there already is one -
   // add a flag in the API to check if timestamp is set by user already before setting timestamp
@@ -52,7 +52,7 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: inject traceid/spanid later
 
   // Send the log record to the processor
-  processor->OnReceive(std::move(record_pointer));
+  processor->OnReceive(record_pointer);
 }
 
 }  // namespace logs
