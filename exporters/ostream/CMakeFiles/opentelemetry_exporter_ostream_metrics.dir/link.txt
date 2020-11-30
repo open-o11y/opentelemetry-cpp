@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libopentelemetry_exporter_ostream_metrics.a CMakeFiles/opentelemetry_exporter_ostream_metrics.dir/src/metrics_exporter.cc.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libopentelemetry_exporter_ostream_metrics.a

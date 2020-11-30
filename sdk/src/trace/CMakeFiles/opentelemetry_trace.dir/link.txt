@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libopentelemetry_trace.a CMakeFiles/opentelemetry_trace.dir/tracer_provider.cc.o CMakeFiles/opentelemetry_trace.dir/tracer.cc.o CMakeFiles/opentelemetry_trace.dir/span.cc.o CMakeFiles/opentelemetry_trace.dir/batch_span_processor.cc.o CMakeFiles/opentelemetry_trace.dir/samplers/parent.cc.o CMakeFiles/opentelemetry_trace.dir/samplers/trace_id_ratio.cc.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libopentelemetry_trace.a

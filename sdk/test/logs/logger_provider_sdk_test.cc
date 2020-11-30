@@ -35,7 +35,10 @@ TEST(LoggerProviderSDK, PushToAPI)
 
 TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 {
-  auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  auto sdklp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  opentelemetry::logs::Provider::SetLoggerProvider(sdklp);
+
+  auto lp = opentelemetry::logs::Provider::GetLoggerProvider();
 
   auto logger1 = lp->GetLogger("logger1");
   auto logger2 = lp->GetLogger("logger2");

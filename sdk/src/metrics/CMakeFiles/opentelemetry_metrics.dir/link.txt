@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libopentelemetry_metrics.a CMakeFiles/opentelemetry_metrics.dir/meter_provider.cc.o CMakeFiles/opentelemetry_metrics.dir/meter.cc.o CMakeFiles/opentelemetry_metrics.dir/ungrouped_processor.cc.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libopentelemetry_metrics.a
