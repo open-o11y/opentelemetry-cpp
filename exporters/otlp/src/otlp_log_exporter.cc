@@ -74,8 +74,7 @@ sdk::logs::ExportResult OtlpLogExporter::Export(
   return sdk::logs::ExportResult::kSuccess;
 }
 
-void Shutdown(
-    std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
+void OtlpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept{}
 
 }  // namespace otlp
 }  // namespace exporter

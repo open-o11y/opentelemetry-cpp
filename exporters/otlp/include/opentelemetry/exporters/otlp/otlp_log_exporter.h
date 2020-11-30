@@ -46,7 +46,7 @@ public:
    * timeout is applied.
    */
   void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+      std::chrono::microseconds timeout) noexcept override;
 
 private:
   // The configuration options associated with this exporter.

@@ -1,7 +1,7 @@
 #include "opentelemetry/exporters/otlp/otlp_log_exporter.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
-#include "opentelemetry/sdk/logs/simple_processor.h"
-#include "opentelemetry/sdk/logs/tracer_provider.h"
+#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
 
 #include <gtest/gtest.h>
