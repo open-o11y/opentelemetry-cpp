@@ -17,6 +17,7 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 
+# Common 
 proto_library(
     name = "common_proto",
     srcs = [
@@ -29,6 +30,7 @@ cc_proto_library(
     deps = [":common_proto"],
 )
 
+# Resource
 proto_library(
     name = "resource_proto",
     srcs = [
@@ -44,6 +46,7 @@ cc_proto_library(
     deps = [":resource_proto"],
 )
 
+# Trace
 proto_library(
     name = "trace_proto",
     srcs = [
@@ -80,5 +83,45 @@ cc_grpc_library(
     srcs = [":trace_service_proto"],
     grpc_only = True,
     deps = [":trace_service_proto_cc"],
+    generate_mocks = True,
+)
+
+# Logs
+proto_library(
+    name = "logs_proto",
+    srcs = [
+      "opentelemetry/proto/logs/v1/logs.proto",
+    ],
+    deps = [
+      ":common_proto",
+      ":resource_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "logs_proto_cc",
+    deps = [":logs_proto"],
+)
+
+proto_library(
+    name = "logs_service_proto",
+    srcs = [
+      "opentelemetry/proto/collector/logs/v1/logs_service.proto",
+    ],
+    deps = [
+      ":logs_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "logs_service_proto_cc",
+    deps = [":logs_service_proto"],
+)
+
+cc_grpc_library(
+    name = "logs_service_grpc_cc",
+    srcs = [":logs_service_proto"],
+    grpc_only = True,
+    deps = [":logs_service_proto_cc"],
     generate_mocks = True,
 )

@@ -70,7 +70,7 @@ message StringKeyValue {
 }
 
 // InstrumentationLibrary is a message representing the instrumentation library information
-// such as the fully qualified name and version.
+// such as the fully qualified name and version. 
 message InstrumentationLibrary {
   string name = 1;
   string version = 2;

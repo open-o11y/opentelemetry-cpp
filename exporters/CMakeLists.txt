@@ -1,3 +1,6 @@
+if(WITH_OTLP)
+  add_subdirectory(otlp)
+endif()
 
 add_subdirectory(ostream)
 add_subdirectory(memory)

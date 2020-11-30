@@ -50,6 +50,26 @@ cc_library(
     ],
 )
 
+
+cc_library(
+    name = "otlp_log_exporter",
+    srcs = [
+        "src/otlp_log_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_log_exporter.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk/src/logs",
+
+        # For gRPC
+        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
+
 cc_test(
     name = "recordable_test",
     srcs = ["test/recordable_test.cc"],
@@ -68,11 +88,28 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+cc_test(
+    name = "otlp_log_exporter_test",
+    srcs = ["test/otlp_log_exporter_test.cc"],
+    deps = [
+        ":otlp_log_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
 otel_cc_benchmark(
     name = "otlp_exporter_benchmark",
     srcs = ["test/otlp_exporter_benchmark.cc"],
     deps = [
         ":otlp_exporter",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "otlp_log_exporter_benchmark",
+    srcs = ["test/otlp_log_exporter_benchmark.cc"],
+    deps = [
+        ":otlp_log_exporter",
     ],
 )
