@@ -6,4 +6,4 @@ target_link_libraries(foo_library opentelemetry_exporter_ostream_span
 
 add_executable(example_traces_and_logs main.cc)
 target_link_libraries(example_traces_and_logs ${CMAKE_THREAD_LIBS_INIT} foo_library
-                      opentelemetry_trace opentelemetry_logs)
+                    opentelemetry_logs)
