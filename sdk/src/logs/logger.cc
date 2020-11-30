@@ -47,9 +47,19 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: Do not want to overwrite user-set timestamp if there already is one -
   // add a flag in the API to check if timestamp is set by user already before setting timestamp
 
-  // Inject timestamp if none is set
-  record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
-  // TODO: inject traceid/spanid later
+  // Inject timestamp (if none is set)
+  if (record_pointer->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
+  {
+    record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  }
+
+  // Inject traceid/spanid (if none is set)
+  auto provider              = opentelemetry::trace::Provider::GetTracerProvider();
+  auto tracer                = provider->GetTracer("foo_library");
+  auto span_context          = tracer->GetCurrentSpan()->GetContext();
+  record_pointer->trace_id   = span_context.trace_id();
+  record_pointer->span_id    = span_context.span_id();
+  record_pointer->trace_flag = span_context.trace_flags();
 
   // Send the log record to the processor
   processor->OnReceive(std::move(record_pointer));
