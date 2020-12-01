@@ -101,6 +101,9 @@ struct LogRecord
     // Assign default values
     timestamp = core::SystemTimestamp(std::chrono::seconds(0));
     severity  = Severity::kDefault;
+    trace_id = trace::TraceId();
+    span_id = trace::SpanId();
+    trace_flags = trace::TraceFlags();
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
