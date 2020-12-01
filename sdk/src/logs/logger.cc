@@ -33,7 +33,7 @@ opentelemetry::nostd::string_view Logger::GetName() noexcept
   return logger_name_;
 }
 
-void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
+void Logger::Log(opentelemetry::logs::LogRecord &record) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();
@@ -44,10 +44,13 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
 
   // TODO: Sampler logic (should include check for minSeverity)
 
+  // Create a shared pointer to the LogRecord to be passed to the processor(s)
+  auto r = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+
   // Inject values into record if not user specified
   // Timestamp
-  if (record->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
-    record->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  if (r->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
+    r->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
 
   
   // Inject traceid/spanid (if none is set)
@@ -56,27 +59,27 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   auto span_context = tracer->GetCurrentSpan()->GetContext();
   
   // Traceid
-  if (!record->trace_id.IsValid())
+  if (!r->trace_id.IsValid())
   {
-     record->trace_id = span_context.trace_id();
+     r->trace_id = span_context.trace_id();
   }
 
   // Spanid
-  if (!record->span_id.IsValid())
+  if (!r->span_id.IsValid())
   {
-    record->span_id = span_context.span_id(); 
+    r->span_id = span_context.span_id(); 
   }
 
   // Traceflag
-  if (!record->trace_flags.IsSampled())
+  if (!r->trace_flags.IsSampled())
   {
-    record->trace_flags = span_context.trace_flags();
+    r->trace_flags = span_context.trace_flags();
   }
 
   // Inject logger name into record
 
   // Send the log record to the processor
-  processor->OnReceive(record);
+  processor->OnReceive(r);
 }
 
 }  // namespace logs

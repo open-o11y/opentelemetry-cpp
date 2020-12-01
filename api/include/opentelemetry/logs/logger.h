@@ -58,7 +58,7 @@ public:
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
    * which should at minimum assign the trace_id, span_id, and timestamp
    */
-  virtual void Log(nostd::shared_ptr<LogRecord> record) noexcept = 0;
+  virtual void Log(LogRecord &record) noexcept = 0;
 
   /** Overloaded methods for unstructured logging **/
   inline void Log(nostd::string_view message) noexcept
@@ -69,13 +69,10 @@ public:
 
   inline void Log(Severity severity, nostd::string_view message) noexcept
   {
-    // TODO: set default timestamp later (not in API)
-    // Log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
-
-    // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    auto r      = nostd::shared_ptr<LogRecord>(new LogRecord);
-    r->severity = severity;
-    r->body     = message;
+    // creates a LogRecord object with given parameters, then calls Log(LogRecord)
+    LogRecord r;
+    r.severity = severity;
+    r.body     = message;
 
     Log(r);
   }
@@ -84,11 +81,11 @@ public:
                   nostd::string_view message,
                   core::SystemTimestamp time) noexcept
   {
-    // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    auto r       = nostd::shared_ptr<LogRecord>(new LogRecord);
-    r->severity  = severity;
-    r->body      = message;
-    r->timestamp = time;
+    // creates a LogRecord object with given parameters, then calls Log(LogRecord)
+    LogRecord r;
+    r.severity  = severity;
+    r.body      = message;
+    r.timestamp = time;
 
     Log(r);
   }
@@ -110,10 +107,10 @@ public:
                   const common::KeyValueIterable &attributes) noexcept
   {
     // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    auto r        = nostd::shared_ptr<LogRecord>(new LogRecord);
-    r->severity   = severity;
-    r->name       = name;
-    r->attributes = attributes;
+    LogRecord r;
+    r.severity   = severity;
+    r.name       = name;
+    r.attributes = attributes;
 
     Log(r);
   }
