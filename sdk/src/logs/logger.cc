@@ -65,7 +65,7 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
 
   // Traceflag
   char flag_buf[2];
-  record->trace_flag.ToLowerBase16(flag_buf);
+  record->trace_flags.ToLowerBase16(flag_buf);
   if (std::string(flag_buf, sizeof(flag_buf)), "00")
   {
     // TODO

@@ -82,9 +82,8 @@ struct LogRecord
   core::SystemTimestamp timestamp;  // uint64 nanoseconds since Unix epoch
   trace::TraceId trace_id;          // byte sequence
   trace::SpanId span_id;            // byte sequence
-  trace::TraceFlags trace_flag;     // byte
-  Severity severity;  // Severity enum that combines severity_text and severity_number in the
-                      // LogDataModel (can separate in SDK)
+  trace::TraceFlags trace_flags;    // byte
+  Severity severity;  // Severity enum that combines severity_text and severity_number 
 
   // other fields that will not be set by default
   nostd::string_view name;  // string

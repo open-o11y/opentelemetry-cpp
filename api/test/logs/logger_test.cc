@@ -76,7 +76,7 @@ TEST(Logger, LogRecordDefaults)
 
   // Check that trace_flags is set to all zeros by default
   char flags_buf[2];
-  r->trace_flag.ToLowerBase16(flags_buf);
+  r->trace_flags.ToLowerBase16(flags_buf);
   ASSERT_EQ(std::string(flags_buf, sizeof(flags_buf)), "00");
 }
 
