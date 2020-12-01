@@ -48,42 +48,42 @@ TEST(Logger, LogMethod)
   logger->Log(Severity::kError, "Error message");
 
   // Test log(LogRecord)
-  auto r      = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
-  r->name     = "Log Record";
-  r->severity = Severity::kInfo;
+  LogRecord r;
+  r.name     = "Log Record";
+  r.severity = Severity::kInfo;
   logger->Log(r);
 }
 
 TEST(Logger, LogRecordDefaults)
 {
-  auto r = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
+  LogRecord r;
 
   // Check that the timestamp is set to 0 by default
-  ASSERT_EQ(r->timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
+  ASSERT_EQ(r.timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
 
   // Check that the severity is set to kDefault by default
-  ASSERT_EQ(r->severity, Severity::kDefault);
+  ASSERT_EQ(r.severity, Severity::kDefault);
 
   // Check that trace_id is set to all zeros by default
   char trace_buf[32];
-  r->trace_id.ToLowerBase16(trace_buf);
+  r.trace_id.ToLowerBase16(trace_buf);
   ASSERT_EQ(std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000");
 
   // Check that span_id is set to all zeros by default
   char span_buf[16];
-  r->span_id.ToLowerBase16(span_buf);
+  r.span_id.ToLowerBase16(span_buf);
   ASSERT_EQ(std::string(span_buf, sizeof(span_buf)), "0000000000000000");
 
   // Check that trace_flags is set to all zeros by default
   char flags_buf[2];
-  r->trace_flags.ToLowerBase16(flags_buf);
+  r.trace_flags.ToLowerBase16(flags_buf);
   ASSERT_EQ(std::string(flags_buf, sizeof(flags_buf)), "00");
 }
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void Log(opentelemetry::nostd::shared_ptr<LogRecord> record) noexcept override {}
+  void Log(LogRecord &record) noexcept override {}
   opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; };
 };
 
