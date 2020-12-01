@@ -11,8 +11,8 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         "//sdk/src/logs",
-        "@github_nlohmann_json//:json",
-
+        "//sdk/src/trace",
+        # "@github_nlohmann_json//:json", 
     ],
 )
 
@@ -21,7 +21,7 @@ cc_test(
     srcs = ["test/ostream_log_test.cc"],
     deps = [
         ":ostream_log_exporter",
-         "@github_nlohmann_json//:json",
+       # "@github_nlohmann_json//:json", # can remove 
         "@com_google_googletest//:gtest_main",
     ],
 )

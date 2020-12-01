@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nlohmann/json.hpp"
+// #include "nlohmann/json.hpp"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -12,8 +12,8 @@
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
-using json = nlohmann::json;
-using ordered_json = nlohmann::ordered_json; // should be working with PR https://github.com/nlohmann/json/pull/2258
+// using json = nlohmann::json;
+// using ordered_json = nlohmann::ordered_json; // should be working with PR https://github.com/nlohmann/json/pull/2258
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

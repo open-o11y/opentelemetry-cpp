@@ -1,10 +1,12 @@
 #include "opentelemetry/exporters/ostream/log_exporter.h"
-#include "opentelemetry/logs/log_record.h"
-#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
-#include "opentelemetry/logs/log_record.h"
-#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/logs/provider.h"
+
+
+//needed? 
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -90,16 +92,15 @@ TEST(OStreamLogExporter, PrintLogToCout)
 
   std::string expectedOutput =
       "{\n"
-      "    \"timestamp\" : " + std::to_string(now.time_since_epoch().count()) + ",\n"
-    //   "    \"timestamp\"     : 0,\n"
-      "    \"severity\" : 9,\n"   
-      "    \"name\" : \"Test Log\",\n"
-      "    \"body\" : \"Message\",\n"
-      "    \"trace_id\" : \"\",\n"
-      "    \"span_id\" : \"\",\n"
-      "    \"trace_flag\" : \"0\"\n"
-    //   "    \"resource\"      : []\n"
-    //   "    \"attributes\"    : []\n"
+      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n"
+      "    severity    : 9\n"   
+      "    name        : Test Log\n"
+      "    body        : Message\n"
+      "    trace_id    : 00000000000000000000000000000000\n"
+      "    span_id     : 0000000000000000\n"
+      "    trace_flags : 00\n"
+    //   "    resource      : []\n"
+    //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
 }
@@ -141,16 +142,15 @@ TEST(OStreamLogExporter, PrintLogToCerr)
 
   std::string expectedOutput =
       "{\n"
-    //   "    \"timestamp\"     : " + std::to_string(now.time_since_epoch().count()) + ",\n"
-      "    \"timestamp\"     : 0,\n"
-      "    \"severity\"      : 9,\n"   
-      "    \"name\"          : \"Test Log\",\n"
-      "    \"body\"          : \"Message\",\n"
-      "    \"trace_id\"      : \"\",\n"
-      "    \"span_id\"       : \"\",\n"
-      "    \"trace_flag\"    : \"\"\n"
-    //   "    \"resource\"      : []\n"
-    //   "    \"attributes\"    : []\n"
+      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n"
+      "    severity    : 9\n"   
+      "    name        : Test Log\n"
+      "    body        : Message\n"
+      "    trace_id    : 00000000000000000000000000000000\n"
+      "    span_id     : 0000000000000000\n"
+      "    trace_flags : 00\n"
+    //   "    resource      : []\n"
+    //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
@@ -177,7 +177,7 @@ TEST(OStreamLogExporter, PrintLogToClog)
 
   auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp = now; 
-  record->severity = logs_api::Severity::kInfo; 
+  record->severity = logs_api::Severity::kInfo; // kInfo = 9
   record->name = "Test Log"; 
   record->body = "Message";
   record->trace_id = trace_id;
@@ -192,21 +192,20 @@ TEST(OStreamLogExporter, PrintLogToClog)
 
   std::string expectedOutput =
       "{\n"
-    //   "    \"timestamp\"     : " + std::to_string(now.time_since_epoch().count()) + ",\n"
-      "    \"timestamp\" : 0,\n"
-      "    \"severity\" : 9,\n"   
-      "    \"name\" : \"Test Log\",\n"
-      "    \"body\" : \"Message\",\n"
-      "    \"trace_id\" : \"\",\n"
-      "    \"span_id\" : \"\",\n"
-      "    \"trace_flag\" : \"\"\n"
-    //   "    \"resource\"      : []\n"
-    //   "    \"attributes\"    : []\n"
+      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n"
+      "    severity    : 9\n"   
+      "    name        : Test Log\n"
+      "    body        : Message\n"
+      "    trace_id    : 00000000000000000000000000000000\n"
+      "    span_id     : 0000000000000000\n"
+      "    trace_flags : 00\n"
+    //   "    resource      : []\n"
+    //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
 
-// ---------------------------------- Integration Test -------------------------
+// ---------------------------------- Integration Tests -------------------------
 
 // Print a log using the full logging pipeline 
 TEST(OStreamLogExporter, IntegrationTest)
@@ -226,18 +225,20 @@ TEST(OStreamLogExporter, IntegrationTest)
   // Back up cout's streambuf 
   std::streambuf *sbuf = std::cout.rdbuf(); 
 
-  // Create stringstream to redirect cout to
+  // Redirect cout to our string stream 
   std::stringstream stdcoutOutput;
   std::cout.rdbuf(stdcoutOutput.rdbuf());
 
   // Write a log to ostream exporter 
-//   auto record = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  // auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  logs_api::LogRecord record;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-//   record->timestamp = now;
-//   logger->log(record);
-//   std::string start = std::to_string(now.time_since_epoch().count());
+  record.timestamp = now;
+  record.severity = logs_api::Severity::kInfo;
+  record.body = "Test Log";
+  logger->log(record);
 
-  logger->log("Test Log");
+  // logger->log("Test Log");
 
   // Restore cout's original streambuf 
   std::cout.rdbuf(sbuf);
@@ -245,15 +246,15 @@ TEST(OStreamLogExporter, IntegrationTest)
   // Compare actual vs expected outputs 
   std::string expectedOutput =
       "{\n"
-      "    \"timestamp\" : ,\n" // how to check?
-      "    \"severity\" : 9,\n"   // kInfo 
-      "    \"name\" : \"\",\n"
-      "    \"body\" : \"Test Log\",\n"
-      "    \"trace_id\" : \"\",\n"
-      "    \"span_id\" : \"\",\n"
-      "    \"trace_flag\" : \"\"\n"
-    //   "    \"resource\" : []\n"
-    //   "    \"attributes\"    : []\n"
+      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n" // how to check?
+      "    severity    : 9\n"   
+      "    name        : \n"
+      "    body        : Test Log\n"
+      "    trace_id    : 00000000000000000000000000000000\n"
+      "    span_id     : 0000000000000000\n"
+      "    trace_flags : 00\n"
+    //   "    resource : []\n"
+    //   "    attributes    : []\n"
       "}\n";
 
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
