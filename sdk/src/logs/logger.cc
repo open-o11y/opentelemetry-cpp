@@ -15,6 +15,8 @@
  */
 
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -47,12 +49,17 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   if (record->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
     record->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
 
-  // Traceid
+  
+  // Inject traceid/spanid (if none is set)
+  auto provider = opentelemetry::trace::Provider::GetTracerProvider();
+  auto tracer = provider->GetTracer("foo_library");
+  auto span_context = tracer->GetCurrentSpan()->GetContext();
+  
   char trace_buf[32];
   record->trace_id.ToLowerBase16(trace_buf);
   if (std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000")
   {
-    // TODO
+     record->trace_id = span_context.trace_id();
   }
 
   // Spanid
@@ -60,7 +67,7 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   record->span_id.ToLowerBase16(span_buf);
   if (std::string(span_buf, sizeof(span_buf)), "0000000000000000")
   {
-    // TODO
+    record->span_id = span_context.span_id(); 
   }
 
   // Traceflag
@@ -68,7 +75,7 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   record->trace_flags.ToLowerBase16(flag_buf);
   if (std::string(flag_buf, sizeof(flag_buf)), "00")
   {
-    // TODO
+    record->trace_flags = span_context.trace_flags();
   }
 
   // Inject logger name into record
