@@ -55,32 +55,25 @@ void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord
   auto tracer = provider->GetTracer("foo_library");
   auto span_context = tracer->GetCurrentSpan()->GetContext();
   
-  char trace_buf[32];
-  record->trace_id.ToLowerBase16(trace_buf);
-  if (std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000")
+  // Traceid
+  if (!record->trace_id.IsValid())
   {
      record->trace_id = span_context.trace_id();
   }
 
   // Spanid
-  char span_buf[16];
-  record->span_id.ToLowerBase16(span_buf);
-  if (std::string(span_buf, sizeof(span_buf)), "0000000000000000")
+  if (!record->span_id.IsValid())
   {
     record->span_id = span_context.span_id(); 
   }
 
   // Traceflag
-  char flag_buf[2];
-  record->trace_flags.ToLowerBase16(flag_buf);
-  if (std::string(flag_buf, sizeof(flag_buf)), "00")
+  if (!record->trace_flags.IsSampled())
   {
     record->trace_flags = span_context.trace_flags();
   }
 
   // Inject logger name into record
-
-  // TODO: inject traceid/spanid later
 
   // Send the log record to the processor
   processor->OnReceive(record);
