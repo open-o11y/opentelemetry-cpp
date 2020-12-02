@@ -45,13 +45,14 @@ void Logger::Log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: Sampler logic (should include check for minSeverity)
 
   // Create a shared pointer to the LogRecord to be passed to the processor(s)
-  auto r = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+  auto record_pointer =
+      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
 
   // Inject values into record if not user specified
   // Timestamp
-  if (r->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
+  if (record_pointer->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
   {
-    r->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+    record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
   }
 
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
@@ -59,27 +60,27 @@ void Logger::Log(const opentelemetry::logs::LogRecord &record) noexcept
   auto span_context = tracer->GetCurrentSpan()->GetContext();
   
   // Traceid
-  if (!r->trace_id.IsValid())
+  if (!record_pointer->trace_id.IsValid())
   {
-     r->trace_id = span_context.trace_id();
+     record_pointer->trace_id = span_context.trace_id();
   }
 
   // Spanid
-  if (!r->span_id.IsValid())
+  if (!record_pointer->span_id.IsValid())
   {
-    r->span_id = span_context.span_id(); 
+    record_pointer->span_id = span_context.span_id(); 
   }
 
   // Traceflag
-  if (!r->trace_flags.IsSampled())
+  if (!record_pointer->trace_flags.IsSampled())
   {
-    r->trace_flags = span_context.trace_flags();
+    record_pointer->trace_flags = span_context.trace_flags();
   }
 
   // TODO: Inject logger name into record
 
   // Send the log record to the processor
-  processor->OnReceive(r);
+  processor->OnReceive(std::move(record_pointer));
 }
 
 }  // namespace logs
