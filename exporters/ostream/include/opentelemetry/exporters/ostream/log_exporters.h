@@ -12,9 +12,6 @@
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
-// using json = nlohmann::json;
-// using ordered_json = nlohmann::ordered_json; // should be working with PR
-// https://github.com/nlohmann/json/pull/2258
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -22,7 +19,7 @@ namespace exporter
 namespace logs
 {
 /**
- * The OStreamLogExporter exports logs through an ostream to JSON format
+ * The OStreamLogExporter exports logs through an ostream (default set to std::cout)
  */
 class OStreamLogExporter final : public sdklogs::LogExporter
 {
@@ -33,10 +30,10 @@ public:
    * The default ostream is set to stdout
    */
   explicit OStreamLogExporter(std::ostream &sout = std::cout) noexcept;
-  sdklogs::ExportResult Export(const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>>
+  sdklogs::ExportResult Export(const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>>
                                    &records) noexcept override;
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   std::ostream &sout_;
