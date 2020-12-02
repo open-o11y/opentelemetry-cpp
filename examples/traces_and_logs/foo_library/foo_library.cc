@@ -1,5 +1,5 @@
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/trace/provider.h"
 
 // Traces
 namespace trace = opentelemetry::trace;

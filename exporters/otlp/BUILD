@@ -50,7 +50,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "otlp_log_exporter",
     srcs = [
@@ -68,7 +67,6 @@ cc_library(
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
-
 
 cc_test(
     name = "recordable_test",
@@ -88,6 +86,7 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
 cc_test(
     name = "otlp_log_exporter_test",
     srcs = ["test/otlp_log_exporter_test.cc"],

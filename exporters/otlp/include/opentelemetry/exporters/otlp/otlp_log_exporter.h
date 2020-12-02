@@ -37,16 +37,15 @@ public:
    * Export a batch of log records in OTLP format.
    * @param records a span of unique pointers to log records
    */
-  sdk::logs::ExportResult Export(
-      const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept override;
+  sdk::logs::ExportResult Export(const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>>
+                                     &records) noexcept override;
 
   /**
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
    */
-  void Shutdown(
-      std::chrono::microseconds timeout) noexcept override;
+  void Shutdown(std::chrono::microseconds timeout) noexcept override;
 
 private:
   // The configuration options associated with this exporter.

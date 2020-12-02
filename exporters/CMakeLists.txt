@@ -1,2 +1,1 @@
-
-add_subdirectory(ostream) 
+add_subdirectory(ostream)

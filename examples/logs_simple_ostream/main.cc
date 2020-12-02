@@ -17,12 +17,14 @@ namespace
 
 void initLogger()
 {
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto exporter =
+      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
-  auto provider = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
+  auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   // Set the global logger provider.
   logs_api::Provider::SetLoggerProvider(provider);
 }

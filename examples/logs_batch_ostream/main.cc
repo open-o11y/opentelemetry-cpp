@@ -24,12 +24,12 @@ void initLogger()
   const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(3000);
   // We export `kNumLogs` after every `schedule_delay_millis` milliseconds.
   const size_t max_export_batch_size = kNumLogs;
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::BatchLogProcessor(
+  auto processor   = std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::BatchLogProcessor(
       std::move(exporter), max_queue_size, schedule_delay_millis, max_export_batch_size));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
   auto apiProvider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(sdkProvider);
-  auto provider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(apiProvider);
+  auto provider    = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(apiProvider);
   // Set the global logger provider.
   opentelemetry::logs::Provider::SetLoggerProvider(provider);
 }

@@ -1,11 +1,10 @@
 #include "opentelemetry/exporters/ostream/log_exporter.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/simple_log_processor.h"
 
-
-//needed? 
+// needed?
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -23,15 +22,15 @@ namespace exporter
 namespace logs
 {
 
-// Test that processor/exporter is shutdown, no logs should be sent to stream 
+// Test that processor/exporter is shutdown, no logs should be sent to stream
 TEST(OStreamLogExporter, Shutdown)
 {
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(
-      new opentelemetry::exporter::logs::OStreamLogExporter);
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto exporter =
+      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
 
-  auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  auto record  = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->name = "Test Log";
 
   // Create stringstream to redirect to
@@ -45,7 +44,7 @@ TEST(OStreamLogExporter, Shutdown)
 
   processor->Shutdown();
 
-  // After processor/exporter is shutdown, no logs should be sent to stream 
+  // After processor/exporter is shutdown, no logs should be sent to stream
   processor->OnReceive(std::move(record));
 
   std::cout.rdbuf(sbuf);
@@ -55,19 +54,19 @@ TEST(OStreamLogExporter, Shutdown)
 
 // ---------------------------------- Print to cout, cerr, and clog -------------------------
 
-// Print Log to std::cout 
+// Print Log to std::cout
 TEST(OStreamLogExporter, PrintLogToCout)
 {
-  // Initialize an Ostream exporter to cout 
+  // Initialize an Ostream exporter to cout
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
       new opentelemetry::exporter::logs::OStreamLogExporter(std::cout));
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
 
   // Save original stream buffer and redirect cout to our new stream buffer
   std::streambuf *sbuf = std::cout.rdbuf();
-  std::stringstream stdcoutOutput; 
-  std::cout.rdbuf(stdcoutOutput.rdbuf()); 
+  std::stringstream stdcoutOutput;
+  std::cout.rdbuf(stdcoutOutput.rdbuf());
 
   // Create a log record and manually set all fields (since we are not using SDK to inject fields)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
@@ -75,13 +74,13 @@ TEST(OStreamLogExporter, PrintLogToCout)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flag;
 
-  auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp = now; 
-  record->severity = logs_api::Severity::kInfo; 
-  record->name = "Test Log"; 
-  record->body = "Message";
-  record->trace_id = trace_id;
-  record->span_id = span_id;
+  auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp  = now;
+  record->severity   = logs_api::Severity::kInfo;
+  record->name       = "Test Log";
+  record->body       = "Message";
+  record->trace_id   = trace_id;
+  record->span_id    = span_id;
   record->trace_flag = trace_flag;
 
   // Log a record to cout
@@ -92,15 +91,17 @@ TEST(OStreamLogExporter, PrintLogToCout)
 
   std::string expectedOutput =
       "{\n"
-      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n"
-      "    severity    : 9\n"   
+      "    timestamp   : " +
+      std::to_string(now.time_since_epoch().count()) +
+      "\n"
+      "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-    //   "    resource      : []\n"
-    //   "    attributes    : []\n"
+      //   "    resource      : []\n"
+      //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
 }
@@ -108,16 +109,16 @@ TEST(OStreamLogExporter, PrintLogToCout)
 // Print log to std::cerr
 TEST(OStreamLogExporter, PrintLogToCerr)
 {
-  // Initialize an Ostream exporter to cerr 
+  // Initialize an Ostream exporter to cerr
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
       new opentelemetry::exporter::logs::OStreamLogExporter(std::cerr));
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
 
   // Save original stream buffer and redirect cerr to our new stream buffer
   std::streambuf *sbuf = std::cerr.rdbuf();
   std::stringstream stdcerrOutput;
-  std::cerr.rdbuf(stdcerrOutput.rdbuf());  
+  std::cerr.rdbuf(stdcerrOutput.rdbuf());
 
   // Create a log record and manually set all fields (since we are not using SDK to inject fields)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
@@ -125,13 +126,13 @@ TEST(OStreamLogExporter, PrintLogToCerr)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flag;
 
-  auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp = now; 
-  record->severity = logs_api::Severity::kInfo; 
-  record->name = "Test Log"; 
-  record->body = "Message";
-  record->trace_id = trace_id;
-  record->span_id = span_id;
+  auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp  = now;
+  record->severity   = logs_api::Severity::kInfo;
+  record->name       = "Test Log";
+  record->body       = "Message";
+  record->trace_id   = trace_id;
+  record->span_id    = span_id;
   record->trace_flag = trace_flag;
 
   // Log a record to cerr
@@ -142,15 +143,17 @@ TEST(OStreamLogExporter, PrintLogToCerr)
 
   std::string expectedOutput =
       "{\n"
-      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n"
-      "    severity    : 9\n"   
+      "    timestamp   : " +
+      std::to_string(now.time_since_epoch().count()) +
+      "\n"
+      "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-    //   "    resource      : []\n"
-    //   "    attributes    : []\n"
+      //   "    resource      : []\n"
+      //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
@@ -161,13 +164,13 @@ TEST(OStreamLogExporter, PrintLogToClog)
   // Initialize an ostream exporter to clog
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
       new opentelemetry::exporter::logs::OStreamLogExporter(std::clog));
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
 
   // Save original stream buffer and redirect clog to our new stream buffer
   std::streambuf *sbuf = std::clog.rdbuf();
-  std::stringstream stdcerrOutput;  
-  std::clog.rdbuf(stdcerrOutput.rdbuf()); 
+  std::stringstream stdcerrOutput;
+  std::clog.rdbuf(stdcerrOutput.rdbuf());
 
   // Create a log record and manually set all fields (since we are not using SDK to inject fields)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
@@ -175,13 +178,13 @@ TEST(OStreamLogExporter, PrintLogToClog)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flag;
 
-  auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp = now; 
-  record->severity = logs_api::Severity::kInfo; // kInfo = 9
-  record->name = "Test Log"; 
-  record->body = "Message";
-  record->trace_id = trace_id;
-  record->span_id = span_id;
+  auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp  = now;
+  record->severity   = logs_api::Severity::kInfo;  // kInfo = 9
+  record->name       = "Test Log";
+  record->body       = "Message";
+  record->trace_id   = trace_id;
+  record->span_id    = span_id;
   record->trace_flag = trace_flag;
 
   // Log a record to clog
@@ -192,76 +195,79 @@ TEST(OStreamLogExporter, PrintLogToClog)
 
   std::string expectedOutput =
       "{\n"
-      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n"
-      "    severity    : 9\n"   
+      "    timestamp   : " +
+      std::to_string(now.time_since_epoch().count()) +
+      "\n"
+      "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-    //   "    resource      : []\n"
-    //   "    attributes    : []\n"
+      //   "    resource      : []\n"
+      //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
 
 // ---------------------------------- Integration Tests -------------------------
 
-// Print a log using the full logging pipeline 
+// Print a log using the full logging pipeline
 TEST(OStreamLogExporter, IntegrationTest)
 {
-  // Initialize a logger 
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(
-      new opentelemetry::exporter::logs::OStreamLogExporter);
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  // Initialize a logger
+  auto exporter =
+      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
-  auto provider = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
+  auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   logs_api::Provider::SetLoggerProvider(provider);
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger("Logger");
 
-  // Back up cout's streambuf 
-  std::streambuf *sbuf = std::cout.rdbuf(); 
+  // Back up cout's streambuf
+  std::streambuf *sbuf = std::cout.rdbuf();
 
-  // Redirect cout to our string stream 
+  // Redirect cout to our string stream
   std::stringstream stdcoutOutput;
   std::cout.rdbuf(stdcoutOutput.rdbuf());
 
-  // Write a log to ostream exporter 
+  // Write a log to ostream exporter
   // auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   logs_api::LogRecord record;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   record.timestamp = now;
-  record.severity = logs_api::Severity::kInfo;
-  record.body = "Test Log";
+  record.severity  = logs_api::Severity::kInfo;
+  record.body      = "Test Log";
   logger->log(record);
 
-  // Restore cout's original streambuf 
+  // Restore cout's original streambuf
   std::cout.rdbuf(sbuf);
 
-  // Compare actual vs expected outputs 
+  // Compare actual vs expected outputs
   std::string expectedOutput =
       "{\n"
-      "    timestamp   : " + std::to_string(now.time_since_epoch().count()) + "\n" // how to check?
-      "    severity    : 9\n"   
+      "    timestamp   : " +
+      std::to_string(now.time_since_epoch().count()) +
+      "\n"  // how to check?
+      "    severity    : 9\n"
       "    name        : \n"
       "    body        : Test Log\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-    //   "    resource : []\n"
-    //   "    attributes    : []\n"
+      //   "    resource : []\n"
+      //   "    attributes    : []\n"
       "}\n";
 
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
 }
 
-// TODO: Test behavior when a log record that is already sent to the processor is logged (unintended use)
+// TODO: Test behavior when a log record that is already sent to the processor is logged (unintended
+// use)
 
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-

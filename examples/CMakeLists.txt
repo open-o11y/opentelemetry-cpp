@@ -4,7 +4,6 @@
 # add_subdirectory(metrics_simple)
 # add_subdirectory(multithreaded)
 
-# OStream examples (commented out because ostream depeendency on Nlohmann/json does not have a CMake build)
-# add_subdirectory(logs_batch_ostream)
-# add_subdirectory(logs_simple_ostream)
-# add_subdirectory(traces_and_logs)
+# OStream examples (commented out because ostream depeendency on Nlohmann/json
+# does not have a CMake build) add_subdirectory(logs_batch_ostream)
+# add_subdirectory(logs_simple_ostream) add_subdirectory(traces_and_logs)

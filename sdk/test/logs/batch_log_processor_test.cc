@@ -43,7 +43,7 @@ public:
         export_delay_(export_delay)
   {}
 
-  // Instead of actually exporting the records (as a normal exporter would do), 
+  // Instead of actually exporting the records (as a normal exporter would do),
   // this test exporter's Export method stores the logs received in an internal data struct
   // similar to an InMemory Exporter
   ExportResult Export(const vector<unique_ptr<LogRecord>> &records) noexcept override
@@ -55,7 +55,7 @@ public:
     for (auto &record : records)
     {
       // Makes a copy of the LogRecord since the original record is a const
-      // and thus can't be moved. May change if a Logger can output to 
+      // and thus can't be moved. May change if a Logger can output to
       // multiple processors.
       auto log = unique_ptr<LogRecord>(new LogRecord());
       if (log != nullptr)
@@ -87,7 +87,7 @@ private:
 /**
  * A fixture class for testing the BatchLogProcessor class that uses the TestExporter defined above.
  */
-class BatchLogProcessorTest : public ::testing::Test  
+class BatchLogProcessorTest : public ::testing::Test
 {
 public:
   // Returns a batch log processor that received a batch of log records, a shared pointer to a
@@ -104,8 +104,8 @@ public:
   {
 
     return shared_ptr<LogProcessor>(new BatchLogProcessor(
-      unique_ptr<LogExporter>(new TestLogExporter(
-        logs_received, is_shutdown, is_export_completed, export_delay)),  // test with move later
+        unique_ptr<LogExporter>(new TestLogExporter(logs_received, is_shutdown, is_export_completed,
+                                                    export_delay)),  // test with move later
         max_queue_size, schedule_delay_millis, max_export_batch_size));
   }
 
@@ -116,7 +116,7 @@ public:
 
     for (int i = 0; i < num_logs; i++)
     {
-      auto record = unique_ptr<LogRecord>(new LogRecord());
+      auto record  = unique_ptr<LogRecord>(new LogRecord());
       record->name = "Log test";
       test_logs->emplace_back(move(record));
       // static_cast<LogRecord *>(test_logs->at(i).get())->name = ("Log test" + to_string(i));
@@ -136,8 +136,8 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
 
   // Create some log records and send them to the batch processor
-  const int num_logs   = 2048;
-  auto test_logs = GetTestRecords(num_logs);
+  const int num_logs = 2048;
+  auto test_logs     = GetTestRecords(num_logs);
   for (int i = 0; i < num_logs; i++)
   {
     batch_processor->OnReceive(move(test_logs->at(i)));
@@ -186,7 +186,7 @@ TEST_F(BatchLogProcessorTest, ExportMaxQueueSizeLogs)
 
   // Create some test log records and send to batch processor
   const int num_logs = 4096;
-  auto test_logs = GetTestRecords(num_logs);
+  auto test_logs     = GetTestRecords(num_logs);
   for (int i = 0; i < num_logs; i++)
   {
     batch_processor->OnReceive(move(test_logs->at(i)));
@@ -210,7 +210,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
 
   // Create 2048 numbered sample log records
   const int num_logs = 2048;
-  auto test_logs = GetTestRecords(num_logs);
+  auto test_logs     = GetTestRecords(num_logs);
   for (int i = 0; i < num_logs; i++)
   {
     batch_processor->OnReceive(move(test_logs->at(i)));
@@ -233,7 +233,8 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
 // Test that max_export_batch_size logs are exported every schedule_delay_milliseconds
 TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
 {
-  // Create a batch processor wth default max_queue_size of 2048 and default max_export_batch_size of 512
+  // Create a batch processor wth default max_queue_size of 2048 and default max_export_batch_size
+  // of 512
   shared_ptr<atomic<bool>> is_shutdown(new atomic<bool>(false));
   shared_ptr<atomic<bool>> is_export_completed(new atomic<bool>(false));
   shared_ptr<vector<unique_ptr<LogRecord>>> logs_received(new vector<unique_ptr<LogRecord>>);
@@ -244,8 +245,8 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
                                           export_delay, schedule_delay_millis);
 
   // Create max_export_batch_size number of sample log records
-  const size_t num_logs = 512; // matches max_export_batch_size of the processor
-  auto test_logs = GetTestRecords(num_logs);
+  const size_t num_logs = 512;  // matches max_export_batch_size of the processor
+  auto test_logs        = GetTestRecords(num_logs);
 
   for (size_t i = 0; i < num_logs; i++)
   {
@@ -280,7 +281,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
 
   // Create some test log records and send them to the batch processor
   const int num_logs = 3;
-  auto test_logs = GetTestRecords(num_logs);
+  auto test_logs     = GetTestRecords(num_logs);
   for (int i = 0; i < num_logs; i++)
   {
     batch_processor->OnReceive(move(test_logs->at(i)));

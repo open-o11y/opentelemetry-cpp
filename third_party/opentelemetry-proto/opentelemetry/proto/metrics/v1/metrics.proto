@@ -149,7 +149,7 @@ message Metric {
 // Gauge represents the type of a int scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
-// 
+//
 // A Gauge does not support different aggregation temporalities. Given the
 // aggregation is unknown, points cannot be combined using the same
 // aggregation, regardless of aggregation temporalities. Therefore,
@@ -162,7 +162,7 @@ message IntGauge {
 // Gauge represents the type of a double scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
-// 
+//
 // A Gauge does not support different aggregation temporalities. Given the
 // aggregation is unknown, points cannot be combined using the same
 // aggregation, regardless of aggregation temporalities. Therefore,
@@ -189,7 +189,7 @@ message IntSum {
 // as a sum of all reported measurements over a time interval.
 message DoubleSum {
   repeated DoubleDataPoint data_points = 1;
-  
+
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
   AggregationTemporality aggregation_temporality = 2;
@@ -292,7 +292,7 @@ enum AggregationTemporality {
   //      number of requests received over the interval of time t_1 to
   //      t_0+1 with a value of 1.
   //
-  // Note: Even though, when reporting changes since last report time, using 
+  // Note: Even though, when reporting changes since last report time, using
   // CUMULATIVE is valid, it is not recommended. This may cause problems for
   // systems that do not use start_time to determine when the aggregation
   // value was reset (e.g. Prometheus).
@@ -311,7 +311,7 @@ message IntDataPoint {
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   //
@@ -320,7 +320,7 @@ message IntDataPoint {
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this aggregation value was reported.
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   fixed64 time_unix_nano = 3;
@@ -345,7 +345,7 @@ message DoubleDataPoint {
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   //
@@ -354,7 +354,7 @@ message DoubleDataPoint {
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this aggregation value was reported.
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   fixed64 time_unix_nano = 3;
@@ -381,7 +381,7 @@ message IntHistogramDataPoint {
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   //
@@ -390,7 +390,7 @@ message IntHistogramDataPoint {
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this aggregation value was reported.
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   fixed64 time_unix_nano = 3;
@@ -457,7 +457,7 @@ message DoubleHistogramDataPoint {
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   //
@@ -466,7 +466,7 @@ message DoubleHistogramDataPoint {
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this aggregation value was reported.
-  // 
+  //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
   fixed64 time_unix_nano = 3;

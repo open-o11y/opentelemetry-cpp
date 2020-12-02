@@ -10,10 +10,10 @@
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
 
 // Traces (to Ostream)
+#include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/exporters/ostream/span_exporter.h"
 
 namespace sdklogs  = opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
@@ -29,8 +29,8 @@ void initTracer()
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
-      new sdktrace::TracerProvider(processor));
+  auto provider =
+      nostd::shared_ptr<trace_api::TracerProvider>(new sdktrace::TracerProvider(processor));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }
@@ -41,12 +41,14 @@ namespace
 
 void initLogger()
 {
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto exporter =
+      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
-  auto provider = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
+  auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   // Set the global logger provider.
   logs_api::Provider::SetLoggerProvider(provider);
 }
@@ -63,4 +65,3 @@ int main()
 
   foo_library();
 }
-

@@ -24,16 +24,15 @@ void PopulateRequest(const std::vector<std::unique_ptr<opentelemetry::logs::LogR
 
   // for (auto &LogRecord : records)
   // {
-  //   auto rec = std::unique_ptr<opentelemetry::logs::LogRecord>(static_cast<LogRecord *>(LogRecord.release()));
-  //   *instrumentation_lib->add_records() = std::move(rec->span());
+  //   auto rec = std::unique_ptr<opentelemetry::logs::LogRecord>(static_cast<LogRecord
+  //   *>(LogRecord.release())); *instrumentation_lib->add_records() = std::move(rec->span());
   // }
 }
 
 /**
  * Create service stub to communicate with the OpenTelemetry Collector.
  */
-std::unique_ptr<proto::collector::logs::v1::LogsService::Stub> MakeServiceStub(
-    std::string endpoint)
+std::unique_ptr<proto::collector::logs::v1::LogsService::Stub> MakeServiceStub(std::string endpoint)
 {
   auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
   return proto::collector::logs::v1::LogsService::NewStub(channel);
@@ -74,7 +73,7 @@ sdk::logs::ExportResult OtlpLogExporter::Export(
   return sdk::logs::ExportResult::kSuccess;
 }
 
-void OtlpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept{}
+void OtlpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept {}
 
 }  // namespace otlp
 }  // namespace exporter
