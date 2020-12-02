@@ -48,13 +48,13 @@ public:
   /**
    * Returns the name of this logger.
    */
-  opentelemetry::nostd::string_view GetName() noexcept override;
+  const opentelemetry::nostd::string_view GetName() noexcept override;
 
   /**
    * Writes a log record into the processor.
    * @param record The record to write into the processor.
    */
-  void Log(opentelemetry::logs::LogRecord &record) noexcept override;
+  void Log(const opentelemetry::logs::LogRecord &record) noexcept override;
 
 private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependancy issues the with
