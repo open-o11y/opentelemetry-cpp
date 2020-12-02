@@ -50,10 +50,10 @@ void Logger::Log(opentelemetry::logs::LogRecord &record) noexcept
   // Inject values into record if not user specified
   // Timestamp
   if (r->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
+  {
     r->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  }
 
-  
-  // Inject traceid/spanid (if none is set)
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
   auto tracer = provider->GetTracer("foo_library");
   auto span_context = tracer->GetCurrentSpan()->GetContext();
@@ -76,7 +76,7 @@ void Logger::Log(opentelemetry::logs::LogRecord &record) noexcept
     r->trace_flags = span_context.trace_flags();
   }
 
-  // Inject logger name into record
+  // TODO: Inject logger name into record
 
   // Send the log record to the processor
   processor->OnReceive(r);
