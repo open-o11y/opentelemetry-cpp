@@ -15,7 +15,7 @@ using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 
-TEST(Logger, GetLoggerDefaultNoop)
+TEST(LoggerTest, GetLoggerDefaultNoop)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
@@ -23,7 +23,7 @@ TEST(Logger, GetLoggerDefaultNoop)
   EXPECT_EQ(logger->GetName(), "noop logger");
 }
 
-TEST(Logger, GetLoggerMethod)
+TEST(LoggerTest, GetLogger)
 {
   auto lp = Provider::GetLoggerProvider();
 
@@ -39,7 +39,7 @@ TEST(Logger, GetLoggerMethod)
   auto logger3 = lp->GetLogger("TestLogger3", args);
 }
 
-TEST(Logger, LogMethod)
+TEST(LoggerTest, Log)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
@@ -52,32 +52,6 @@ TEST(Logger, LogMethod)
   r.name     = "Log Record";
   r.severity = Severity::kInfo;
   logger->Log(r);
-}
-
-TEST(Logger, LogRecordDefaults)
-{
-  LogRecord r;
-
-  // Check that the timestamp is set to 0 by default
-  ASSERT_EQ(r.timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
-
-  // Check that the severity is set to kDefault by default
-  ASSERT_EQ(r.severity, Severity::kDefault);
-
-  // Check that trace_id is set to all zeros by default
-  char trace_buf[32];
-  r.trace_id.ToLowerBase16(trace_buf);
-  ASSERT_EQ(std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000");
-
-  // Check that span_id is set to all zeros by default
-  char span_buf[16];
-  r.span_id.ToLowerBase16(span_buf);
-  ASSERT_EQ(std::string(span_buf, sizeof(span_buf)), "0000000000000000");
-
-  // Check that trace_flags is set to all zeros by default
-  char flags_buf[2];
-  r.trace_flags.ToLowerBase16(flags_buf);
-  ASSERT_EQ(std::string(flags_buf, sizeof(flags_buf)), "00");
 }
 
 // Define a basic Logger class
@@ -101,7 +75,7 @@ class TestProvider : public LoggerProvider
   }
 };
 
-TEST(Logger, PushLoggerImplementation)
+TEST(LoggerTest, PushLoggerImplementation)
 {
   // Push the new loggerprovider class into the API
   auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
@@ -113,4 +87,30 @@ TEST(Logger, PushLoggerImplementation)
   // "test logger" as defined in the custom implementation
   auto logger = lp->GetLogger("TestLogger");
   ASSERT_EQ("test logger", logger->GetName());
+}
+
+TEST(LogRecord, SetDefault)
+{
+  LogRecord r;
+
+  // Check that the timestamp is set to 0 by default
+  ASSERT_EQ(r.timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
+
+  // Check that the severity is set to kDefault by default
+  ASSERT_EQ(r.severity, Severity::kDefault);
+
+  // Check that trace_id is set to all zeros by default
+  char trace_buf[32];
+  r.trace_id.ToLowerBase16(trace_buf);
+  ASSERT_EQ(std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000");
+
+  // Check that span_id is set to all zeros by default
+  char span_buf[16];
+  r.span_id.ToLowerBase16(span_buf);
+  ASSERT_EQ(std::string(span_buf, sizeof(span_buf)), "0000000000000000");
+
+  // Check that trace_flags is set to all zeros by default
+  char flags_buf[2];
+  r.trace_flags.ToLowerBase16(flags_buf);
+  ASSERT_EQ(std::string(flags_buf, sizeof(flags_buf)), "00");
 }
