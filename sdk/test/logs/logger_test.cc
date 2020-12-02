@@ -17,7 +17,6 @@
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 
 #include <gtest/gtest.h>
