@@ -50,7 +50,9 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   // add a flag in the API to check if timestamp is set by user already before setting timestamp
 
   // Inject timestamp (if none is set)
-  record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  if (record_pointer->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0))){
+    record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  }
 
   // Inject traceid/spanid (if none is set)
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();

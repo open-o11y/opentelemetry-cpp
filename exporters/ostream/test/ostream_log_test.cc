@@ -238,8 +238,6 @@ TEST(OStreamLogExporter, IntegrationTest)
   record.body = "Test Log";
   logger->log(record);
 
-  // logger->log("Test Log");
-
   // Restore cout's original streambuf 
   std::cout.rdbuf(sbuf);
 
