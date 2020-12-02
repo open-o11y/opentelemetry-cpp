@@ -4,6 +4,6 @@ foreach(
   logger_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_logs opentelemetry_exporter_in_memory)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_logs)
   gtest_add_tests(TARGET ${testname} TEST_PREFIX logs. TEST_LIST ${testname})
 endforeach()
