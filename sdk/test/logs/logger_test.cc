@@ -25,7 +25,7 @@
 using namespace opentelemetry::sdk::logs;
 namespace sdktrace  = opentelemetry::sdk::trace;
 
-TEST(LoggerSDK, LoggerName)
+TEST(Logger, LoggerName)
 {
   auto lp      = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
   auto logger1 = lp->GetLogger("logger1");
@@ -35,7 +35,7 @@ TEST(LoggerSDK, LoggerName)
   ASSERT_EQ("logger2", logger2->GetName());
 }
 
-TEST(LoggerSDK, LogToNullProcessor)
+TEST(Logger, LogToNullProcessor)
 {
   // Confirm Logger::log() does not have undefined behavior
   // even when there is no processor set
@@ -59,7 +59,7 @@ class DummyProcessor : public LogProcessor
 };
 
 
-TEST(LoggerSDK, DefaultValueInjection)
+TEST(Logger, DefaultValueInjection)
 {
   // TODO: once a Log Exporter is implemented, check that 
   // timestamp, traceid, spanid, and traceflags were 

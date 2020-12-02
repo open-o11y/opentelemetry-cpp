@@ -23,7 +23,7 @@
 
 using namespace opentelemetry::sdk::logs;
 
-TEST(LoggerProviderSDK, PushToAPI)
+TEST(LoggerProvider, PushToAPI)
 {
   auto lp = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(
       new opentelemetry::sdk::logs::LoggerProvider());
@@ -33,7 +33,7 @@ TEST(LoggerProviderSDK, PushToAPI)
   ASSERT_EQ(lp, opentelemetry::logs::Provider::GetLoggerProvider());
 }
 
-TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
+TEST(LoggerProvider, LoggerProviderGetLoggerSimple)
 {
   auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
 
@@ -52,7 +52,7 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
   ASSERT_EQ(logger1, logger3);
 }
 
-TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
+TEST(LoggerProvider, LoggerProviderLoggerArguments)
 {
   // Currently, arguments are not supported by the loggers.
   // TODO: Once the logging spec defines what arguments are allowed, add more
@@ -75,7 +75,7 @@ class DummyProcessor : public LogProcessor
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 };
 
-TEST(LoggerProviderSDK, GetAndSetProcessor)
+TEST(LoggerProvider, GetAndSetProcessor)
 {
   // Create a LoggerProvider without a processor
   LoggerProvider lp;
@@ -87,7 +87,7 @@ TEST(LoggerProviderSDK, GetAndSetProcessor)
   ASSERT_EQ(proc2, lp.GetProcessor());
 }
 
-TEST(LoggerProviderSDK, LoggerLimit)
+TEST(LoggerProvider, LoggerLimit)
 {
   auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
 

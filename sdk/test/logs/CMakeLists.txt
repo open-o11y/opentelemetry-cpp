@@ -1,7 +1,7 @@
 foreach(
   testname 
-  logger_provider_sdk_test 
-  logger_sdk_test)
+  logger_provider_test 
+  logger_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_logs opentelemetry_exporter_in_memory)
