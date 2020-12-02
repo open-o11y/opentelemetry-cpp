@@ -72,7 +72,7 @@ TEST(OStreamLogExporter, PrintLogToCout)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   opentelemetry::trace::SpanId span_id;
   opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::TraceFlags trace_flag;
+  opentelemetry::trace::TraceFlags trace_flags;
 
   auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp  = now;
@@ -81,7 +81,7 @@ TEST(OStreamLogExporter, PrintLogToCout)
   record->body       = "Message";
   record->trace_id   = trace_id;
   record->span_id    = span_id;
-  record->trace_flag = trace_flag;
+  record->trace_flags= trace_flags;
 
   // Log a record to cout
   processor->OnReceive(std::move(record));
@@ -124,7 +124,7 @@ TEST(OStreamLogExporter, PrintLogToCerr)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   opentelemetry::trace::SpanId span_id;
   opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::TraceFlags trace_flag;
+  opentelemetry::trace::TraceFlags trace_flags;
 
   auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp  = now;
@@ -133,7 +133,7 @@ TEST(OStreamLogExporter, PrintLogToCerr)
   record->body       = "Message";
   record->trace_id   = trace_id;
   record->span_id    = span_id;
-  record->trace_flag = trace_flag;
+  record->trace_flags= trace_flags;
 
   // Log a record to cerr
   processor->OnReceive(std::move(record));
@@ -176,7 +176,7 @@ TEST(OStreamLogExporter, PrintLogToClog)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   opentelemetry::trace::SpanId span_id;
   opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::TraceFlags trace_flag;
+  opentelemetry::trace::TraceFlags trace_flags;
 
   auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp  = now;
@@ -185,7 +185,7 @@ TEST(OStreamLogExporter, PrintLogToClog)
   record->body       = "Message";
   record->trace_id   = trace_id;
   record->span_id    = span_id;
-  record->trace_flag = trace_flag;
+  record->trace_flags= trace_flags;
 
   // Log a record to clog
   processor->OnReceive(std::move(record));
@@ -241,9 +241,9 @@ TEST(OStreamLogExporter, IntegrationTest)
   record.timestamp = now;
   record.severity  = logs_api::Severity::kInfo;
   record.body      = "Test Log";
-  logger->log(record);
+  logger->Log(record);
 
-  // logger->log("Test Log");
+  // logger->Log("Test Log");
 
   // Restore cout's original streambuf
   std::cout.rdbuf(sbuf);

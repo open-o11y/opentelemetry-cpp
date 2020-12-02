@@ -29,8 +29,8 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     char span_id[16] = {0};
     record->span_id.ToLowerBase16(span_id);
 
-    char trace_flag[2] = {0};
-    record->trace_flag.ToLowerBase16(trace_flag);
+    char trace_flags[2] = {0};
+    record->trace_flags.ToLowerBase16(trace_flags);
 
     // Print out each field of the log record
 
@@ -44,7 +44,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
           //       << "    attributes     : " <<   record->attributes << "\n"
           << "    trace_id    : " << std::string(trace_id, 32) << "\n"
           << "    span_id     : " << std::string(span_id, 16) << "\n"
-          << "    trace_flags : " << std::string(trace_flag, 2) << "\n"
+          << "    trace_flags : " << std::string(trace_flags, 2) << "\n"
           << "}\n";
   }
 

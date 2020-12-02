@@ -34,11 +34,6 @@ std::shared_ptr<Sampler> TracerProvider::GetSampler() const noexcept
 {
   return sampler_;
 }
-
-void TracerProvider::Shutdown() noexcept
-{
-  GetProcessor()->Shutdown();
-}
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -37,6 +37,6 @@ LICENSE*                text
 *.pdf                   binary
 *.rtf                   binary
 
-## git files
-.gitignore              text eol=lf
-.gitattributes          text eol=lf
+## Self-reference =)
+.gitignore              text
+.gitattributes          text
