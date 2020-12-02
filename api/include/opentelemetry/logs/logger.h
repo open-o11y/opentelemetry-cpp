@@ -39,7 +39,7 @@ public:
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
-  virtual nostd::string_view GetName() noexcept = 0;
+  virtual const nostd::string_view GetName() noexcept = 0;
 
   /**
    * Each of the following overloaded log(...) methods
@@ -58,7 +58,7 @@ public:
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
    * which should at minimum assign the trace_id, span_id, and timestamp
    */
-  virtual void Log(LogRecord &record) noexcept = 0;
+  virtual void Log(const LogRecord &record) noexcept = 0;
 
   /** Overloaded methods for unstructured logging **/
   inline void Log(nostd::string_view message) noexcept
