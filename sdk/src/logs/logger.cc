@@ -28,12 +28,12 @@ Logger::Logger(opentelemetry::nostd::string_view name,
     : logger_name_(name), logger_provider_(logger_provider)
 {}
 
-opentelemetry::nostd::string_view Logger::GetName() noexcept
+const opentelemetry::nostd::string_view Logger::GetName() noexcept
 {
   return logger_name_;
 }
 
-void Logger::Log(opentelemetry::logs::LogRecord &record) noexcept
+void Logger::Log(const opentelemetry::logs::LogRecord &record) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();

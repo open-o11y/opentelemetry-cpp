@@ -41,8 +41,8 @@ class NoopLogger final : public Logger
 public:
   NoopLogger() = default;
 
-  void Log(LogRecord& record) noexcept override {}
-  nostd::string_view GetName() noexcept override { return "noop logger"; };
+  void Log(const LogRecord& record) noexcept override {}
+  const nostd::string_view GetName() noexcept override { return "noop logger"; };
 };
 
 /**

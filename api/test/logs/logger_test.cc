@@ -57,8 +57,8 @@ TEST(LoggerTest, Log)
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void Log(LogRecord &record) noexcept override {}
-  opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; };
+  void Log(const LogRecord &record) noexcept override {}
+  const opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; };
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
