@@ -21,11 +21,17 @@ namespace sdk
 {
 namespace logs
 {
-Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
-    : logger_provider_(logger_provider)
+Logger::Logger(opentelemetry::nostd::string_view name,
+               std::shared_ptr<LoggerProvider> logger_provider) noexcept
+    : logger_name_(name), logger_provider_(logger_provider)
 {}
 
-void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
+const opentelemetry::nostd::string_view Logger::GetName() noexcept
+{
+  return logger_name_;
+}
+
+void Logger::Log(const opentelemetry::logs::LogRecord &record) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();

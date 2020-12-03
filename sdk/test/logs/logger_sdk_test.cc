@@ -32,7 +32,7 @@ TEST(LoggerSDK, LogToNullProcessor)
   // Log a sample log record to a nullptr processor
   opentelemetry::logs::LogRecord r;
   r.name = "Test log";
-  logger->log(r);
+  logger->Log(r);
 }
 
 class DummyProcessor : public LogProcessor
@@ -73,5 +73,5 @@ TEST(LoggerSDK, LogToAProcessor)
   // Log a sample log record to the processor
   opentelemetry::logs::LogRecord r;
   r.name = "Test log";
-  logger->log(r);
+  logger->Log(r);
 }
