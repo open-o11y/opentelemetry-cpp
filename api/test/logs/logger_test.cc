@@ -97,10 +97,10 @@ TEST(Logger, LogMethodOverloads)
   ASSERT_EQ(record_->name, "Log Name");
   ASSERT_EQ(record_->body, "This is the log message");
 
-  // Test Log(severity, name, KVIterable) method
-  std::map<std::string, std::string> m1 = {{"key1", "val1"}, {"key2", "val2"}};
-  logger->Log(Severity::kWarn, "Logging a map", m1);
-  ASSERT_EQ(record_->severity, Severity::kWarn);
+  // Test Trace(name, KVIterable) method
+  std::map<std::string, std::string> m = {{"key1", "val1"}, {"key2", "val2"}};
+  logger->Trace("Logging a map", m);
+  ASSERT_EQ(record_->severity, Severity::kTrace);
   ASSERT_EQ(record_->name, "Logging a map");
   ASSERT_EQ(record_->attributes->size(), 2);
 }

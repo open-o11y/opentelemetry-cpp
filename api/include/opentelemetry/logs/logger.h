@@ -61,7 +61,7 @@ public:
   virtual void Log(const LogRecord &record) noexcept = 0;
 
   ///Overloaded Log methods, which are simpler than calling a LogRecord directly
-
+  
   /** 
    * Writes a log.
    * @param severity The log's severity
@@ -134,8 +134,49 @@ public:
     Log(r);
   }
 
-  // TODO: add function aliases such as void debug(), void trace(), void info(), etc. for each
-  // severity level
+  ///Trace overloads
+
+  /** 
+   * Writes a log with a severity of trace.
+   * @param message The message to log
+   */
+  inline void Trace(nostd::string_view message) noexcept
+  {
+    Log(Severity::kTrace, message);
+  }
+
+  /** 
+   * Writes a log with a severity of trace.
+   * @param name The name of the log
+   * @param message The message to log
+   */
+  inline void Trace(nostd::string_view name, nostd::string_view message) noexcept
+  {
+    Log(Severity::kTrace, name, message);
+  }
+
+  /** 
+   * Writes a log with a severity of trace.
+   * @param attributes A key/value object
+   */
+  template <class T,
+          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  inline void Trace(const T &attributes) noexcept
+  {
+    Log(Severity::kTrace, attributes);
+  }
+
+  /** 
+   * Writes a log with a severity of trace.
+   * @param name The name of the log
+   * @param attributes A key/value object
+   */
+  template <class T,
+          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  inline void Trace(nostd::string_view name, const T &attributes) noexcept
+  {
+    Log(Severity::kTrace, name, attributes);
+  }
 
   /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
    * classes, etc) **/
