@@ -46,7 +46,7 @@ void Logger::Log(const opentelemetry::logs::LogRecord &record) noexcept
 
   // Create a shared pointer to the LogRecord to be passed to the processor(s)
   auto record_pointer =
-      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+      std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
 
   // Inject values into record if not user specified
   // Timestamp
@@ -80,7 +80,7 @@ void Logger::Log(const opentelemetry::logs::LogRecord &record) noexcept
   // TODO: Inject logger name into record
 
   // Send the log record to the processor
-  processor->OnReceive(std::move(record_pointer));
+  processor->OnReceive(record_pointer);
 }
 
 }  // namespace logs

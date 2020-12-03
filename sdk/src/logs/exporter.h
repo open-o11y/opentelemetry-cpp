@@ -67,7 +67,7 @@ public:
    * @param records: a vector of shared pointers to log records
    */
   virtual ExportResult Export(
-      const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
+      const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>& records) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

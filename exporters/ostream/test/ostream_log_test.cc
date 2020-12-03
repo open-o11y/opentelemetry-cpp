@@ -27,7 +27,7 @@ TEST(OStreamLogExporter, Shutdown)
   auto processor =
       std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
 
-  auto record  = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  auto record  = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->name = "Test Log";
 
   // Create stringstream to redirect to
@@ -42,7 +42,7 @@ TEST(OStreamLogExporter, Shutdown)
   processor->Shutdown();
 
   // After processor/exporter is shutdown, no logs should be sent to stream
-  processor->OnReceive(std::move(record));
+  processor->OnReceive(record);
 
   std::cout.rdbuf(sbuf);
 
@@ -71,7 +71,7 @@ TEST(OStreamLogExporter, PrintLogToCout)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  auto record        = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp  = now;
   record->severity   = logs_api::Severity::kInfo;
   record->name       = "Test Log";
@@ -81,7 +81,7 @@ TEST(OStreamLogExporter, PrintLogToCout)
   record->trace_flags= trace_flags;
 
   // Log a record to cout
-  processor->OnReceive(std::move(record));
+  processor->OnReceive(record);
 
   // Reset cout's original stringstream buffer
   std::cout.rdbuf(sbuf);
@@ -123,7 +123,7 @@ TEST(OStreamLogExporter, PrintLogToCerr)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  auto record        = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp  = now;
   record->severity   = logs_api::Severity::kInfo;
   record->name       = "Test Log";
@@ -133,7 +133,7 @@ TEST(OStreamLogExporter, PrintLogToCerr)
   record->trace_flags= trace_flags;
 
   // Log a record to cerr
-  processor->OnReceive(std::move(record));
+  processor->OnReceive(record);
 
   // Reset cerr's original stringstream buffer
   std::cerr.rdbuf(sbuf);
@@ -175,7 +175,7 @@ TEST(OStreamLogExporter, PrintLogToClog)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record        = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  auto record        = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   record->timestamp  = now;
   record->severity   = logs_api::Severity::kInfo;  // kInfo = 9
   record->name       = "Test Log";
@@ -185,7 +185,7 @@ TEST(OStreamLogExporter, PrintLogToClog)
   record->trace_flags= trace_flags;
 
   // Log a record to clog
-  processor->OnReceive(std::move(record));
+  processor->OnReceive(record);
 
   // Reset clog's original stringstream buffer
   std::clog.rdbuf(sbuf);
@@ -232,7 +232,7 @@ TEST(OStreamLogExporter, IntegrationTest)
   std::cout.rdbuf(stdcoutOutput.rdbuf());
 
   // Write a log to ostream exporter
-  // auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  // auto record = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   logs_api::LogRecord record;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   record.timestamp = now;

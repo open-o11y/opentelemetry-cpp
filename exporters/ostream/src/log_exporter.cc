@@ -13,7 +13,7 @@ namespace logs
 OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 sdklogs::ExportResult OStreamLogExporter::Export(
-    const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
+    const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>> & records) noexcept
 {
   if (isShutdown_)
   {

@@ -30,8 +30,8 @@ public:
    * The default ostream is set to stdout
    */
   explicit OStreamLogExporter(std::ostream &sout = std::cout) noexcept;
-  sdklogs::ExportResult Export(const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>>
-                                   &records) noexcept override;
+  sdklogs::ExportResult Export(const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>> &
+                                   records) noexcept override;
 
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
