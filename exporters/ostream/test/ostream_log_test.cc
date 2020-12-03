@@ -1,8 +1,10 @@
+// see which of these headers can be removed
 #include "opentelemetry/exporters/ostream/log_exporter.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
 
 // needed?
 #include "opentelemetry/logs/log_record.h"
