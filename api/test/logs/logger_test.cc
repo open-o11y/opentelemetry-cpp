@@ -45,7 +45,7 @@ static opentelemetry::nostd::shared_ptr<LogRecord> record_;
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void Log(const LogRecord &record) noexcept override 
+  void Log(const LogRecord &record) noexcept override
   {
     record_ = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord(record));
   }
@@ -86,11 +86,12 @@ TEST(Logger, LogMethodOverloads)
   auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
   Provider::SetLoggerProvider(test_provider);
 
-  auto lp = Provider::GetLoggerProvider();
+  auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
 
-  // Check that calling the Log() overloads correctly constructs a log record which is automatically put into the static logger_ for testing
-  
+  // Check that calling the Log() overloads correctly constructs a log record which is automatically
+  // put into the static logger_ for testing
+
   // Test Log(severity, name, message) method
   logger->Log(Severity::kError, "Log Name", "This is the log message");
   ASSERT_EQ(record_->severity, Severity::kError);

@@ -78,7 +78,7 @@ struct LogRecord
   trace::TraceId trace_id;          // byte sequence
   trace::SpanId span_id;            // byte sequence
   trace::TraceFlags trace_flags;    // byte
-  Severity severity;  // Severity enum that combines severity_text and severity_number 
+  Severity severity;                // Severity enum that combines severity_text and severity_number
 
   // other fields that will not be set by default
   nostd::string_view name;  // string
@@ -94,10 +94,10 @@ struct LogRecord
   LogRecord()
   {
     // Assign default values
-    timestamp = core::SystemTimestamp(std::chrono::seconds(0));
-    severity  = Severity::kDefault;
-    trace_id = trace::TraceId();
-    span_id = trace::SpanId();
+    timestamp   = core::SystemTimestamp(std::chrono::seconds(0));
+    severity    = Severity::kDefault;
+    trace_id    = trace::TraceId();
+    span_id     = trace::SpanId();
     trace_flags = trace::TraceFlags();
   }
 

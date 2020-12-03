@@ -54,31 +54,32 @@ public:
    * @throws No exceptions under any circumstances.
    */
 
-  /** 
-   * Logs a LogRecord, which contains all the fields of the Log Data Model. Normally called indirectly from other Log() Methods, but can be called directly for high detail. 
+  /**
+   * Logs a LogRecord, which contains all the fields of the Log Data Model. Normally called
+   * indirectly from other Log() Methods, but can be called directly for high detail.
    * @param record A log record filled with information from the user.
    */
   virtual void Log(const LogRecord &record) noexcept = 0;
 
-  ///Overloaded Log methods, which are simpler than calling a LogRecord directly
-  
-  /** 
+  /// Overloaded Log methods, which are simpler than calling a LogRecord directly
+
+  /**
    * Writes a log.
    * @param severity The log's severity
    * @param message The message to log
    */
   inline void Log(Severity severity, nostd::string_view message) noexcept
   {
-    //Create a LogRecord to hold this information
+    // Create a LogRecord to hold this information
     LogRecord r;
-    r.severity   = severity;
-    r.body    = message;
+    r.severity = severity;
+    r.body     = message;
 
-    //Call the main Log(LogRecord) method
+    // Call the main Log(LogRecord) method
     Log(r);
   }
 
-  /** 
+  /**
    * Writes a log.
    * @param severity The log's severity
    * @param name The name of the log
@@ -86,64 +87,63 @@ public:
    */
   inline void Log(Severity severity, nostd::string_view name, nostd::string_view message) noexcept
   {
-    //Create a LogRecord to hold this information
+    // Create a LogRecord to hold this information
     LogRecord r;
     r.severity = severity;
     r.name     = name;
     r.body     = message;
 
-    //Call the main Log(LogRecord) method
+    // Call the main Log(LogRecord) method
     Log(r);
   }
 
-  /** 
+  /**
    * Writes a log.
    * @param severity The severity of the log, from 1 to 24
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Log(Severity severity, const T &attributes) noexcept
   {
-    //Create a LogRecord to hold this information
+    // Create a LogRecord to hold this information
     LogRecord r;
-    r.severity = severity;
-    r.attributes = nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<T>{attributes});
+    r.severity   = severity;
+    r.attributes = nostd::shared_ptr<common::KeyValueIterable>(
+        new common::KeyValueIterableView<T>{attributes});
 
-    //Call the main Log(LogRecord) method
+    // Call the main Log(LogRecord) method
     Log(r);
   }
 
-  /** 
+  /**
    * Writes a log.
    * @param severity The severity of the log, from 1 to 24
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
   {
-    //Create a LogRecord to hold this information
+    // Create a LogRecord to hold this information
     LogRecord r;
     r.severity   = severity;
     r.name       = name;
-    r.attributes = nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<T>{attributes});
+    r.attributes = nostd::shared_ptr<common::KeyValueIterable>(
+        new common::KeyValueIterableView<T>{attributes});
 
-    //Call the main Log(LogRecord) method
+    // Call the main Log(LogRecord) method
     Log(r);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of trace.
    * @param message The message to log
    */
-  inline void Trace(nostd::string_view message) noexcept
-  {
-    Log(Severity::kTrace, message);
-  }
+  inline void Trace(nostd::string_view message) noexcept { Log(Severity::kTrace, message); }
 
-  /** 
+  /**
    * Writes a log with a severity of trace.
    * @param name The name of the log
    * @param message The message to log
@@ -153,39 +153,36 @@ public:
     Log(Severity::kTrace, name, message);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of trace.
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Trace(const T &attributes) noexcept
   {
     Log(Severity::kTrace, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of trace.
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Trace(nostd::string_view name, const T &attributes) noexcept
   {
     Log(Severity::kTrace, name, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of debug.
    * @param message The message to log
    */
-  inline void Debug(nostd::string_view message) noexcept
-  {
-    Log(Severity::kDebug, message);
-  }
+  inline void Debug(nostd::string_view message) noexcept { Log(Severity::kDebug, message); }
 
-  /** 
+  /**
    * Writes a log with a severity of debug.
    * @param name The name of the log
    * @param message The message to log
@@ -195,39 +192,36 @@ public:
     Log(Severity::kDebug, name, message);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of debug.
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Debug(const T &attributes) noexcept
   {
     Log(Severity::kDebug, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of debug.
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Debug(nostd::string_view name, const T &attributes) noexcept
   {
     Log(Severity::kDebug, name, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of info.
    * @param message The message to log
    */
-  inline void Info(nostd::string_view message) noexcept
-  {
-    Log(Severity::kInfo, message);
-  }
+  inline void Info(nostd::string_view message) noexcept { Log(Severity::kInfo, message); }
 
-  /** 
+  /**
    * Writes a log with a severity of info.
    * @param name The name of the log
    * @param message The message to log
@@ -237,39 +231,36 @@ public:
     Log(Severity::kInfo, name, message);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of info.
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Info(const T &attributes) noexcept
   {
     Log(Severity::kInfo, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of info.
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Info(nostd::string_view name, const T &attributes) noexcept
   {
     Log(Severity::kInfo, name, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of warn.
    * @param message The message to log
    */
-  inline void Warn(nostd::string_view message) noexcept
-  {
-    Log(Severity::kWarn, message);
-  }
+  inline void Warn(nostd::string_view message) noexcept { Log(Severity::kWarn, message); }
 
-  /** 
+  /**
    * Writes a log with a severity of warn.
    * @param name The name of the log
    * @param message The message to log
@@ -279,39 +270,36 @@ public:
     Log(Severity::kWarn, name, message);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of warn.
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Warn(const T &attributes) noexcept
   {
     Log(Severity::kWarn, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of warn.
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Warn(nostd::string_view name, const T &attributes) noexcept
   {
     Log(Severity::kWarn, name, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of error.
    * @param message The message to log
    */
-  inline void Error(nostd::string_view message) noexcept
-  {
-    Log(Severity::kError, message);
-  }
+  inline void Error(nostd::string_view message) noexcept { Log(Severity::kError, message); }
 
-  /** 
+  /**
    * Writes a log with a severity of error.
    * @param name The name of the log
    * @param message The message to log
@@ -321,39 +309,36 @@ public:
     Log(Severity::kError, name, message);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of error.
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Error(const T &attributes) noexcept
   {
     Log(Severity::kError, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of error.
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Error(nostd::string_view name, const T &attributes) noexcept
   {
     Log(Severity::kError, name, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of fatal.
    * @param message The message to log
    */
-  inline void Fatal(nostd::string_view message) noexcept
-  {
-    Log(Severity::kFatal, message);
-  }
+  inline void Fatal(nostd::string_view message) noexcept { Log(Severity::kFatal, message); }
 
-  /** 
+  /**
    * Writes a log with a severity of fatal.
    * @param name The name of the log
    * @param message The message to log
@@ -363,29 +348,28 @@ public:
     Log(Severity::kFatal, name, message);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of fatal.
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Fatal(const T &attributes) noexcept
   {
     Log(Severity::kFatal, attributes);
   }
 
-  /** 
+  /**
    * Writes a log with a severity of fatal.
    * @param name The name of the log
    * @param attributes A key/value object
    */
   template <class T,
-          nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void Fatal(nostd::string_view name, const T &attributes) noexcept
   {
     Log(Severity::kFatal, name, attributes);
   }
-
 
   /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
    * classes, etc) **/
