@@ -39,25 +39,16 @@ TEST(LoggerTest, GetLogger)
   auto logger3 = lp->GetLogger("TestLogger3", args);
 }
 
-TEST(LoggerTest, Log)
-{
-  auto lp     = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
-
-  // Test log(severity, name) method
-  logger->Log(Severity::kError, "Error message");
-
-  // Test log(LogRecord)
-  LogRecord r;
-  r.name     = "Log Record";
-  r.severity = Severity::kInfo;
-  logger->Log(r);
-}
+// Define a global log record that will be modified when the Log() method is called
+static opentelemetry::nostd::shared_ptr<LogRecord> record_;
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void Log(const LogRecord &record) noexcept override {}
+  void Log(const LogRecord &record) noexcept override 
+  {
+    record_ = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord(record));
+  }
   const opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; };
 };
 
@@ -87,6 +78,31 @@ TEST(LoggerTest, PushLoggerImplementation)
   // "test logger" as defined in the custom implementation
   auto logger = lp->GetLogger("TestLogger");
   ASSERT_EQ("test logger", logger->GetName());
+}
+
+TEST(Logger, LogMethodOverloads)
+{
+  // Use the same TestProvider and TestLogger from the previous test
+  auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
+  Provider::SetLoggerProvider(test_provider);
+
+  auto lp = Provider::GetLoggerProvider();
+  auto logger = lp->GetLogger("TestLogger");
+
+  // Check that calling the Log() overloads correctly constructs a log record which is automatically put into the static logger_ for testing
+  
+  // Test Log(severity, name, message) method
+  logger->Log(Severity::kError, "Log Name", "This is the log message");
+  ASSERT_EQ(record_->severity, Severity::kError);
+  ASSERT_EQ(record_->name, "Log Name");
+  ASSERT_EQ(record_->body, "This is the log message");
+
+  // Test Log(severity, name, KVIterable) method
+  std::map<std::string, std::string> m1 = {{"key1", "val1"}, {"key2", "val2"}};
+  logger->Log(Severity::kWarn, "Logging a map", m1);
+  ASSERT_EQ(record_->severity, Severity::kWarn);
+  ASSERT_EQ(record_->name, "Logging a map");
+  ASSERT_EQ(record_->attributes->size(), 2);
 }
 
 TEST(LogRecord, SetDefault)

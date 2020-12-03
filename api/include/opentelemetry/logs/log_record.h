@@ -65,11 +65,6 @@ enum class Severity : uint8_t
   kDefault = kInfo  // default severity is set to kInfo level, similar to what is done in ILogger
 };
 
-/* _nullKV is defined as a private variable that allows "resource" and
-    "attributes" fields to be instantiated using it as the default value */
-static common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>> _nullKV =
-    common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>>{{}};
-
 /**
  * A default Event object to be passed in log statements,
  * matching the 10 fields of the Log Data Model.
@@ -88,15 +83,15 @@ struct LogRecord
   // other fields that will not be set by default
   nostd::string_view name;  // string
   nostd::string_view body;  // currently a simple string, but should be changed "Any" type
-  common::KeyValueIterable &resource;    // key/value pair list
-  common::KeyValueIterable &attributes;  // key/value pair list
+  nostd::shared_ptr<common::KeyValueIterable> resource;    // key/value pair list
+  nostd::shared_ptr<common::KeyValueIterable> attributes;  // key/value pair list
 
   /* Default log record if user does not overwrite this.
    * TODO: find better data type to represent the <Any> type for "body"
    * Future enhancement: Potentially add other constructors to take default arguments
    * from the user
    **/
-  LogRecord() : resource(_nullKV), attributes(_nullKV)
+  LogRecord()
   {
     // Assign default values
     timestamp = core::SystemTimestamp(std::chrono::seconds(0));
