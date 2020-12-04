@@ -26,7 +26,7 @@ public:
 
   // Stores the names of the log records this exporter receives to an internal list
   ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<LogRecord>> &records) noexcept override
+      const opentelemetry::nostd::span<std::shared_ptr<LogRecord>> &records) noexcept override
   {
     *batch_size_received = records.size();
     for (auto &record : records)
@@ -66,12 +66,12 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
   const int num_logs = 5;
   for (int i = 0; i < num_logs; i++)
   {
-    auto record = std::unique_ptr<LogRecord>(new LogRecord());
+    auto record = std::shared_ptr<LogRecord>(new LogRecord());
     std::string s("Log name");
     s += std::to_string(i);
     record->name = s;
 
-    processor.OnReceive(std::move(record));
+    processor.OnReceive(record);
 
     // Verify that the batch of 1 log record sent by processor matches what exporter received
     EXPECT_EQ(1, batch_size_received);
@@ -116,7 +116,7 @@ public:
   FailShutDownExporter() {}
 
   ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<LogRecord>> &records) noexcept override
+      const opentelemetry::nostd::span<std::shared_ptr<LogRecord>> &records) noexcept override
   {
     return ExportResult::kSuccess;
   }

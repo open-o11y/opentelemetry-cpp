@@ -15,6 +15,8 @@
  */
 
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -36,23 +38,43 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
 
   // TODO: Sampler logic (should include check for minSeverity)
 
-  /**
-   * Convert the LogRecord to the heap first before sending to processor.
-   * TODO: Change the API log(LogRecord) function to log(*LogRecord) so the following line
-   * converting record a heap variable can be removed
-   */
+  // Create a shared pointer to the LogRecord to be passed to the processor(s)
   auto record_pointer =
-      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+      std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
 
-  // TODO: Do not want to overwrite user-set timestamp if there already is one -
-  // add a flag in the API to check if timestamp is set by user already before setting timestamp
+  // Inject values into record if not user specified
+  // Timestamp
+  if (record_pointer->timestamp == opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)))
+  {
+    record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+  }
 
-  // Inject timestamp if none is set
-  record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
-  // TODO: inject traceid/spanid later
+  auto provider     = opentelemetry::trace::Provider::GetTracerProvider();
+  auto tracer       = provider->GetTracer("foo_library");
+  auto span_context = tracer->GetCurrentSpan()->GetContext();
+
+  // Traceid
+  if (!record_pointer->trace_id.IsValid())
+  {
+    record_pointer->trace_id = span_context.trace_id();
+  }
+
+  // Spanid
+  if (!record_pointer->span_id.IsValid())
+  {
+    record_pointer->span_id = span_context.span_id();
+  }
+
+  // Traceflag
+  if (!record_pointer->trace_flag.IsSampled())
+  {
+    record_pointer->trace_flag = span_context.trace_flags();
+  }
+
+  // TODO: Inject logger name into record
 
   // Send the log record to the processor
-  processor->OnReceive(std::move(record_pointer));
+  processor->OnReceive(record_pointer);
 }
 
 }  // namespace logs

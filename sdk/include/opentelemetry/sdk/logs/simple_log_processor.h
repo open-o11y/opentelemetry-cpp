@@ -43,7 +43,7 @@ public:
   explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter);
   virtual ~SimpleLogProcessor() = default;
 
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override;
+  void OnReceive(std::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept override;
 
   bool ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
