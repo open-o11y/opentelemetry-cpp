@@ -107,7 +107,8 @@ struct LogRecord
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetResource(const T &_resource)
   {
-    resource = common::KeyValueIterableView<T>(_resource);
+    resource = nostd::shared_ptr<common::KeyValueIterable>(
+        new common::KeyValueIterableView<T>{_resource});
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
@@ -116,7 +117,8 @@ struct LogRecord
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetAttributes(const T &_attributes)
   {
-    attributes = common::KeyValueIterableView<T>(_attributes);
+    attributes = nostd::shared_ptr<common::KeyValueIterable>(
+        new common::KeyValueIterableView<T>{_attributes});
   }
 };
 }  // namespace logs

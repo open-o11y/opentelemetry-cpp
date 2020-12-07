@@ -109,8 +109,7 @@ public:
     // Create a LogRecord to hold this information
     LogRecord r;
     r.severity   = severity;
-    r.attributes = nostd::shared_ptr<common::KeyValueIterable>(
-        new common::KeyValueIterableView<T>{attributes});
+    r.SetAttributes(attributes);
 
     // Call the main Log(LogRecord) method
     Log(r);
@@ -130,8 +129,7 @@ public:
     LogRecord r;
     r.severity   = severity;
     r.name       = name;
-    r.attributes = nostd::shared_ptr<common::KeyValueIterable>(
-        new common::KeyValueIterableView<T>{attributes});
+    r.SetAttributes(attributes);
 
     // Call the main Log(LogRecord) method
     Log(r);
