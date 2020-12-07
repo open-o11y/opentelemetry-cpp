@@ -238,9 +238,9 @@ TEST(OStreamLogExporter, IntegrationTest)
   record.timestamp = now;
   record.severity  = logs_api::Severity::kInfo;
   record.body      = "Test Log";
-  logger->Log(record);
+  logger->log(record);
 
-  // logger->Log("Test Log");
+  // logger->log("Test Log");
 
   // Restore cout's original streambuf
   std::cout.rdbuf(sbuf);

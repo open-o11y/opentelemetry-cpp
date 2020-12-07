@@ -82,26 +82,27 @@ struct LogRecord
   core::SystemTimestamp timestamp;  // uint64 nanoseconds since Unix epoch
   trace::TraceId trace_id;          // byte sequence
   trace::SpanId span_id;            // byte sequence
-  trace::TraceFlags trace_flag;     // byte
-  Severity severity;  // Severity enum that combines severity_text and severity_number in the
-                      // LogDataModel (can separate in SDK)
+  trace::TraceFlags trace_flags;    // byte
+  Severity severity;                // Severity enum that combines severity_text and severity_number
 
   // other fields that will not be set by default
   nostd::string_view name;  // string
   nostd::string_view body;  // currently a simple string, but should be changed "Any" type
-  common::KeyValueIterable &resource;    // key/value pair list
-  common::KeyValueIterable &attributes;  // key/value pair list
+  nostd::shared_ptr<common::KeyValueIterable> resource;    // key/value pair list
+  nostd::shared_ptr<common::KeyValueIterable> attributes;  // key/value pair list
 
   /* Default log record if user does not overwrite this.
    * TODO: find better data type to represent the <Any> type for "body"
    * Future enhancement: Potentially add other constructors to take default arguments
    * from the user
    **/
-  LogRecord() : resource(_nullKV), attributes(_nullKV)
-  {
-    // TODO: in SDK, assign a default timestamp if not specified
-    name = "";
-  }
+  LogRecord()
+      : timestamp{core::SystemTimestamp(std::chrono::seconds(0))},
+        severity{Severity::kDefault},
+        trace_id{trace::TraceId()},
+        span_id{trace::SpanId()},
+        trace_flags{trace::TraceFlags()}
+  {}
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
    * resources field */
@@ -109,7 +110,8 @@ struct LogRecord
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetResource(const T &_resource)
   {
-    resource = common::KeyValueIterableView<T>(_resource);
+    resource =
+        nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<T>{_resource});
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
@@ -118,7 +120,8 @@ struct LogRecord
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetAttributes(const T &_attributes)
   {
-    attributes = common::KeyValueIterableView<T>(_attributes);
+    attributes = nostd::shared_ptr<common::KeyValueIterable>(
+        new common::KeyValueIterableView<T>{_attributes});
   }
 };
 }  // namespace logs
