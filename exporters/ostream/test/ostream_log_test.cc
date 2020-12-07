@@ -204,7 +204,7 @@ TEST(OStreamLogExporter, PrintLogToClog)
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    resource    : {}\n"
-      "    attributes  : {{key1: }, {key2: }}\n"
+      "    attributes  : {{key1: val1}, {key2: val2}}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"

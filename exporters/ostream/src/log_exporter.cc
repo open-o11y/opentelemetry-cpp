@@ -36,7 +36,9 @@ sdklogs::ExportResult OStreamLogExporter::Export(
 
     sout_ << "{\n"
           << "    timestamp   : " << record->timestamp.time_since_epoch().count() << "\n"
-          << "    severity    : " << static_cast<int>(record->severity) << "\n"
+          << "    severity    : " << static_cast<int>(record->severity)
+          << "\n"
+          // << "    severity    : " << severityMap[static_cast<int>(record->severity)] << "\n"
           << "    name        : " << record->name << "\n"
           << "    body        : " << record->body << "\n";
 

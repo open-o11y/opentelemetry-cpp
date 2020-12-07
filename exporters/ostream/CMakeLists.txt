@@ -30,7 +30,7 @@ if(BUILD_TESTING)
     TARGET ostream_metrics_test
     TEST_PREFIX exporter.
     TEST_LIST ostream_metrics_test)
-    
+
   gtest_add_tests(
     TARGET ostream_span_test
     TEST_PREFIX exporter.

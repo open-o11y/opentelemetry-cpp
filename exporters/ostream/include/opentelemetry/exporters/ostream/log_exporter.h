@@ -23,41 +23,6 @@ namespace logs
 class OStreamLogExporter final : public sdklogs::LogExporter
 {
 private:
-  template <typename T>
-  void print_value(const T &item)
-  {
-    sout_ << item;
-  }
-
-// Prior to C++14, generic lambda is not available so fallback to functor.
-#if __cplusplus < 201402L
-
-  class AttributeValueVisitor
-  {
-  public:
-    AttributeValueVisitor(OStreamLogExporter &exporter) : exporter_(exporter) {}
-
-    template <typename T>
-    void operator()(T &&arg)
-    {
-      exporter_.print_value(arg);
-    }
-
-  private:
-    OStreamLogExporter &exporter_;
-  };
-
-#endif
-
-  void print_value(common::AttributeValue &value)
-  {
-#if __cplusplus < 201402L
-    // nostd::visit(AttributeValueVisitor(*this), value);
-#else
-    nostd::visit([this](auto &&arg) { sout_ << arg; }, value);
-#endif
-  }
-
   void printKV(nostd::string_view &key, common::AttributeValue &value)
   {
     if (firstKV)
@@ -69,9 +34,7 @@ private:
       sout_ << ", ";
     }
 
-    sout_ << "{" << key << ": ";
-    print_value(value);
-    sout_ << "}";
+    sout_ << "{" << key << ": " << nostd::get<nostd::string_view>(value) << "}";
   }
 
 public:
@@ -93,7 +56,7 @@ private:
   bool firstKV     = true;
 
   // Mapping severity number to severity text from api/include/opentelemetry/logs/log_record.h
-  std::map<int, std::string> severityMap{
+  const std::map<int, std::string> severityMap{
       {1, "kTrace"},  {2, "kTrace2"},  {3, "kTrace3"},  {4, "kTrace4"},  {5, "kDebug"},
       {6, "kDebug2"}, {7, "kDebug3"},  {8, "kDebug4"},  {9, "kInfo"},    {10, "kInfo2"},
       {11, "kInfo3"}, {12, "kInfo4"},  {13, "kWarn"},   {14, "kWarn2"},  {15, "kWarn3"},
