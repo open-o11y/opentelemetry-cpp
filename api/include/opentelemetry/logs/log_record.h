@@ -92,14 +92,12 @@ struct LogRecord
    * from the user
    **/
   LogRecord()
-  {
-    // Assign default values
-    timestamp   = core::SystemTimestamp(std::chrono::seconds(0));
-    severity    = Severity::kDefault;
-    trace_id    = trace::TraceId();
-    span_id     = trace::SpanId();
-    trace_flags = trace::TraceFlags();
-  }
+      : timestamp{core::SystemTimestamp(std::chrono::seconds(0))},
+        severity{Severity::kDefault},
+        trace_id{trace::TraceId()},
+        span_id{trace::SpanId()},
+        trace_flags{trace::TraceFlags()}
+  {}
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
    * resources field */
@@ -107,8 +105,8 @@ struct LogRecord
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetResource(const T &_resource)
   {
-    resource = nostd::shared_ptr<common::KeyValueIterable>(
-        new common::KeyValueIterableView<T>{_resource});
+    resource =
+        nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<T>{_resource});
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the

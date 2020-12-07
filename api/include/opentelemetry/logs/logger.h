@@ -56,7 +56,8 @@ public:
 
   /**
    * Logs a LogRecord, which contains all the fields of the Log Data Model. Normally called
-   * indirectly from other Log() Methods, but can be called directly for high detail.
+   * indirectly from other Log() methods, but can be called directly for complex logs that have
+   * many fields and datatypes.
    * @param record A log record filled with information from the user.
    */
   virtual void Log(const LogRecord &record) noexcept = 0;
@@ -108,7 +109,7 @@ public:
   {
     // Create a LogRecord to hold this information
     LogRecord r;
-    r.severity   = severity;
+    r.severity = severity;
     r.SetAttributes(attributes);
 
     // Call the main Log(LogRecord) method
@@ -127,8 +128,8 @@ public:
   {
     // Create a LogRecord to hold this information
     LogRecord r;
-    r.severity   = severity;
-    r.name       = name;
+    r.severity = severity;
+    r.name     = name;
     r.SetAttributes(attributes);
 
     // Call the main Log(LogRecord) method

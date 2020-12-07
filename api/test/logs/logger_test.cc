@@ -80,7 +80,7 @@ TEST(LoggerTest, PushLoggerImplementation)
   ASSERT_EQ("test logger", logger->GetName());
 }
 
-TEST(Logger, LogMethodOverloads)
+TEST(LoggerTest, LogMethodOverloads)
 {
   // Use the same TestProvider and TestLogger from the previous test
   auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
