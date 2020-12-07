@@ -52,7 +52,7 @@ TEST(OStreamLogExporter, Shutdown)
 // ---------------------------------- Print to cout, cerr, and clog -------------------------
 
 // Print Log to std::cout
-TEST(OStreamLogExporter, PrintLogToCout)
+TEST(OStreamLogExporter, PrintSimpleLogToCout)
 {
   // Initialize an Ostream exporter to cout
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
@@ -67,18 +67,12 @@ TEST(OStreamLogExporter, PrintLogToCout)
 
   // Create a log record and manually set all fields (since we are not using SDK to inject fields)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-  opentelemetry::trace::SpanId span_id;
-  opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record         = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp   = now;
-  record->severity    = logs_api::Severity::kInfo;
-  record->name        = "Test Log";
-  record->body        = "Message";
-  record->trace_id    = trace_id;
-  record->span_id     = span_id;
-  record->trace_flags = trace_flags;
+  auto record       = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp = now;
+  record->severity  = logs_api::Severity::kInfo;
+  record->name      = "Test Log";
+  record->body      = "Message";
 
   // Log a record to cout
   processor->OnReceive(record);
@@ -104,7 +98,7 @@ TEST(OStreamLogExporter, PrintLogToCout)
 }
 
 // Print log to std::cerr
-TEST(OStreamLogExporter, PrintLogToCerr)
+TEST(OStreamLogExporter, PrintLogWithAttributesToCerr)
 {
   // Initialize an Ostream exporter to cerr
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
@@ -119,18 +113,18 @@ TEST(OStreamLogExporter, PrintLogToCerr)
 
   // Create a log record and manually set all fields (since we are not using SDK to inject fields)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-  opentelemetry::trace::SpanId span_id;
-  opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record         = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp   = now;
-  record->severity    = logs_api::Severity::kInfo;
-  record->name        = "Test Log";
-  record->body        = "Message";
-  record->trace_id    = trace_id;
-  record->span_id     = span_id;
-  record->trace_flags = trace_flags;
+  auto record       = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp = now;
+  record->severity  = logs_api::Severity::kInfo;
+  record->name      = "Test Log";
+  record->body      = "Message";
+
+  // Set attributes for this log record of type <string, string>
+  using M = std::map<std::string, std::string>;
+  M m     = {{"key1", "val1"}, {"key2", "val2"}};
+  record->resource =
+      nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<M>{m});
 
   // Log a record to cerr
   processor->OnReceive(record);
@@ -146,7 +140,7 @@ TEST(OStreamLogExporter, PrintLogToCerr)
       "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
-      "    resource    : {}\n"
+      "    resource    : {{key1: val1}, {key2: val2}}\n"
       "    attributes  : {}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
@@ -156,7 +150,7 @@ TEST(OStreamLogExporter, PrintLogToCerr)
 }
 
 // Pirnt log to std::clog
-TEST(OStreamLogExporter, PrintLogToClog)
+TEST(OStreamLogExporter, PrintLogWithAttributesAndResourcesToClog)
 {
   // Initialize an ostream exporter to clog
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
@@ -171,21 +165,22 @@ TEST(OStreamLogExporter, PrintLogToClog)
 
   // Create a log record and manually set all fields (since we are not using SDK to inject fields)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-  opentelemetry::trace::SpanId span_id;
-  opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record         = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp   = now;
-  record->severity    = logs_api::Severity::kInfo;  // kInfo = 9
-  record->name        = "Test Log";
-  record->body        = "Message";
-  record->trace_id    = trace_id;
-  record->span_id     = span_id;
-  record->trace_flags = trace_flags;
+  auto record       = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp = now;
+  record->severity  = logs_api::Severity::kInfo;  // kInfo = 9
+  record->name      = "Test Log";
+  record->body      = "Message";
 
+  // Set resources to this log record of type <string, int>
+  using N     = std::map<std::string, int>;
+  N resources = {{"key1", 3}, {"key2", 4}, {"key3", 5}};
+  record->resource =
+      nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<N>{resources});
+
+  // Set attributes to this log record of type <string, string>
   using M = std::map<std::string, std::string>;
-  M m     = {{"key1", "val1"}, {"key2", "val2"}};
+  M m     = {{"attr1", "val1"}, {"attr2", "val2"}};
   record->attributes =
       nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<M>{m});
 
@@ -203,8 +198,8 @@ TEST(OStreamLogExporter, PrintLogToClog)
       "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
-      "    resource    : {}\n"
-      "    attributes  : {{key1: val1}, {key2: val2}}\n"
+      "    resource    : {{key1: 3}, {key2: 4}, {key3: 5}}\n"
+      "    attributes  : {{attr1: val1}, {attr2: val2}}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
@@ -237,17 +232,12 @@ TEST(OStreamLogExporter, IntegrationTest)
   std::cout.rdbuf(stdcoutOutput.rdbuf());
 
   // Write a log to ostream exporter
-  // auto record = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
   logs_api::LogRecord record;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   record.timestamp = now;
   record.severity  = logs_api::Severity::kInfo;
   record.name      = "Name";
   record.body      = "Message";
-  using M          = std::map<std::string, std::string>;
-  M m              = {{"key1", "val1"}, {"key2", "val2"}};
-  //   record.attributes  = nostd::shared_ptr<common::KeyValueIterable>(new
-  //   common::KeyValueIterableView<M>{m}); record.attributes  = nullptr;
 
   logger->log(record);
 
@@ -265,7 +255,6 @@ TEST(OStreamLogExporter, IntegrationTest)
       "    body        : Message\n"
       "    resource    : {}\n"
       "    attributes  : {}\n"
-      //   "    attributes  : {{key1: }, {key2: }}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"

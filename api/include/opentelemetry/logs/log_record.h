@@ -74,10 +74,10 @@ enum class Severity : uint8_t
 struct LogRecord
 {
   // default fields that will be set if the user doesn't specify them
-  core::SystemTimestamp timestamp;  // uint64 nanoseconds since Unix epoch
-  trace::TraceId trace_id;          // byte sequence
-  trace::SpanId span_id;            // byte sequence
-  trace::TraceFlags trace_flags;    // byte
+  core::SystemTimestamp timestamp;  // default is 0
+  trace::TraceId trace_id;          // default is 00000000000000000000000000000000
+  trace::SpanId span_id;            // default is 0000000000000000
+  trace::TraceFlags trace_flags;    // default is 00
   Severity severity;                // Severity enum that combines severity_text and severity_number
 
   // other fields that will not be set by default

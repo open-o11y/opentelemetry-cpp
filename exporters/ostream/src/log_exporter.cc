@@ -32,8 +32,9 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     char trace_flags[2] = {0};
     record->trace_flags.ToLowerBase16(trace_flags);
 
-    // Print out each field of the log record
+    /*** Print out each field of the log record ***/
 
+    // Print most relevant fields first
     sout_ << "{\n"
           << "    timestamp   : " << record->timestamp.time_since_epoch().count() << "\n"
           << "    severity    : " << static_cast<int>(record->severity)
@@ -42,6 +43,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
           << "    name        : " << record->name << "\n"
           << "    body        : " << record->body << "\n";
 
+    // Print resource
     sout_ << "    resource    : {";
     if (record->resource != nullptr)
     {
@@ -54,12 +56,11 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     }
     sout_ << "}\n";
 
+    // Print attributes
     sout_ << "    attributes  : {";
     if (record->attributes != nullptr)
     {
-      firstKV   = true;
-      int count = 0;
-      int size  = record->attributes->size();
+      firstKV = true;
       record->attributes->ForEachKeyValue([&](nostd::string_view key,
                                               common::AttributeValue value) noexcept {
         printKV(key, value);
@@ -68,6 +69,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     }
     sout_ << "}\n";
 
+    // Print span context
     sout_ << "    trace_id    : " << std::string(trace_id, 32) << "\n"
           << "    span_id     : " << std::string(span_id, 16) << "\n"
           << "    trace_flags : " << std::string(trace_flags, 2) << "\n"
