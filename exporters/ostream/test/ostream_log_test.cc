@@ -71,14 +71,14 @@ TEST(OStreamLogExporter, PrintLogToCout)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record        = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp  = now;
-  record->severity   = logs_api::Severity::kInfo;
-  record->name       = "Test Log";
-  record->body       = "Message";
-  record->trace_id   = trace_id;
-  record->span_id    = span_id;
-  record->trace_flags= trace_flags;
+  auto record         = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp   = now;
+  record->severity    = logs_api::Severity::kInfo;
+  record->name        = "Test Log";
+  record->body        = "Message";
+  record->trace_id    = trace_id;
+  record->span_id     = span_id;
+  record->trace_flags = trace_flags;
 
   // Log a record to cout
   processor->OnReceive(record);
@@ -94,11 +94,11 @@ TEST(OStreamLogExporter, PrintLogToCout)
       "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
+      "    resource    : {}\n"
+      "    attributes  : {}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-      //   "    resource      : []\n"
-      //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
 }
@@ -123,14 +123,14 @@ TEST(OStreamLogExporter, PrintLogToCerr)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record        = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp  = now;
-  record->severity   = logs_api::Severity::kInfo;
-  record->name       = "Test Log";
-  record->body       = "Message";
-  record->trace_id   = trace_id;
-  record->span_id    = span_id;
-  record->trace_flags= trace_flags;
+  auto record         = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp   = now;
+  record->severity    = logs_api::Severity::kInfo;
+  record->name        = "Test Log";
+  record->body        = "Message";
+  record->trace_id    = trace_id;
+  record->span_id     = span_id;
+  record->trace_flags = trace_flags;
 
   // Log a record to cerr
   processor->OnReceive(record);
@@ -146,11 +146,11 @@ TEST(OStreamLogExporter, PrintLogToCerr)
       "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
+      "    resource    : {}\n"
+      "    attributes  : {}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-      //   "    resource      : []\n"
-      //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
@@ -175,14 +175,19 @@ TEST(OStreamLogExporter, PrintLogToClog)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::TraceFlags trace_flags;
 
-  auto record        = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->timestamp  = now;
-  record->severity   = logs_api::Severity::kInfo;  // kInfo = 9
-  record->name       = "Test Log";
-  record->body       = "Message";
-  record->trace_id   = trace_id;
-  record->span_id    = span_id;
-  record->trace_flags= trace_flags;
+  auto record         = std::shared_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
+  record->timestamp   = now;
+  record->severity    = logs_api::Severity::kInfo;  // kInfo = 9
+  record->name        = "Test Log";
+  record->body        = "Message";
+  record->trace_id    = trace_id;
+  record->span_id     = span_id;
+  record->trace_flags = trace_flags;
+
+  using M = std::map<std::string, std::string>;
+  M m     = {{"key1", "val1"}, {"key2", "val2"}};
+  record->attributes =
+      nostd::shared_ptr<common::KeyValueIterable>(new common::KeyValueIterableView<M>{m});
 
   // Log a record to clog
   processor->OnReceive(record);
@@ -198,11 +203,11 @@ TEST(OStreamLogExporter, PrintLogToClog)
       "    severity    : 9\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
+      "    resource    : {}\n"
+      "    attributes  : {{key1: }, {key2: }}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-      //   "    resource      : []\n"
-      //   "    attributes    : []\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
@@ -237,10 +242,14 @@ TEST(OStreamLogExporter, IntegrationTest)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
   record.timestamp = now;
   record.severity  = logs_api::Severity::kInfo;
-  record.body      = "Test Log";
-  logger->log(record);
+  record.name      = "Name";
+  record.body      = "Message";
+  using M          = std::map<std::string, std::string>;
+  M m              = {{"key1", "val1"}, {"key2", "val2"}};
+  //   record.attributes  = nostd::shared_ptr<common::KeyValueIterable>(new
+  //   common::KeyValueIterableView<M>{m}); record.attributes  = nullptr;
 
-  // logger->log("Test Log");
+  logger->log(record);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(sbuf);
@@ -250,22 +259,20 @@ TEST(OStreamLogExporter, IntegrationTest)
       "{\n"
       "    timestamp   : " +
       std::to_string(now.time_since_epoch().count()) +
-      "\n"  // how to check?
+      "\n"
       "    severity    : 9\n"
-      "    name        : \n"
-      "    body        : Test Log\n"
+      "    name        : Name\n"
+      "    body        : Message\n"
+      "    resource    : {}\n"
+      "    attributes  : {}\n"
+      //   "    attributes  : {{key1: }, {key2: }}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
-      //   "    resource : []\n"
-      //   "    attributes    : []\n"
       "}\n";
 
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
 }
-
-// TODO: Test behavior when a log record that is already sent to the processor is logged (unintended
-// use)
 
 }  // namespace logs
 }  // namespace exporter

@@ -13,7 +13,7 @@ namespace logs
 OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 sdklogs::ExportResult OStreamLogExporter::Export(
-    const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>> & records) noexcept
+    const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
 {
   if (isShutdown_)
   {
@@ -38,11 +38,35 @@ sdklogs::ExportResult OStreamLogExporter::Export(
           << "    timestamp   : " << record->timestamp.time_since_epoch().count() << "\n"
           << "    severity    : " << static_cast<int>(record->severity) << "\n"
           << "    name        : " << record->name << "\n"
-          << "    body        : " << record->body
-          << "\n"
-          //       << "    resource     : " <<   record->resource << "\n"
-          //       << "    attributes     : " <<   record->attributes << "\n"
-          << "    trace_id    : " << std::string(trace_id, 32) << "\n"
+          << "    body        : " << record->body << "\n";
+
+    sout_ << "    resource    : {";
+    if (record->resource != nullptr)
+    {
+      firstKV = true;
+      record->resource->ForEachKeyValue([&](nostd::string_view key,
+                                            common::AttributeValue value) noexcept {
+        printKV(key, value);
+        return true;
+      });
+    }
+    sout_ << "}\n";
+
+    sout_ << "    attributes  : {";
+    if (record->attributes != nullptr)
+    {
+      firstKV   = true;
+      int count = 0;
+      int size  = record->attributes->size();
+      record->attributes->ForEachKeyValue([&](nostd::string_view key,
+                                              common::AttributeValue value) noexcept {
+        printKV(key, value);
+        return true;
+      });
+    }
+    sout_ << "}\n";
+
+    sout_ << "    trace_id    : " << std::string(trace_id, 32) << "\n"
           << "    span_id     : " << std::string(span_id, 16) << "\n"
           << "    trace_flags : " << std::string(trace_flags, 2) << "\n"
           << "}\n";

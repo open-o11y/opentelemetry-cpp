@@ -65,11 +65,6 @@ enum class Severity : uint8_t
   kDefault = kInfo  // default severity is set to kInfo level, similar to what is done in ILogger
 };
 
-/* _nullKV is defined as a private variable that allows "resource" and
-    "attributes" fields to be instantiated using it as the default value */
-static common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>> _nullKV =
-    common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>>{{}};
-
 /**
  * A default Event object to be passed in log statements,
  * matching the 10 fields of the Log Data Model.
