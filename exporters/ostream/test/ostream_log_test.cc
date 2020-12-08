@@ -85,7 +85,7 @@ TEST(OStreamLogExporter, PrintSimpleLogToCout)
       "    timestamp   : " +
       std::to_string(now.time_since_epoch().count()) +
       "\n"
-      "    severity    : 9\n"
+      "    severity    : kInfo\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    resource    : {}\n"
@@ -135,7 +135,7 @@ TEST(OStreamLogExporter, PrintLogWithResourceToCerr)
       "    timestamp   : " +
       std::to_string(now.time_since_epoch().count()) +
       "\n"
-      "    severity    : 9\n"
+      "    severity    : kInfo\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    resource    : {{key1: val1}, {key2: val2}}\n"
@@ -190,11 +190,11 @@ TEST(OStreamLogExporter, PrintLogWithMixedAttributesToClog)
       "    timestamp   : " +
       std::to_string(now.time_since_epoch().count()) +
       "\n"
-      "    severity    : 9\n"
+      "    severity    : kInfo\n"
       "    name        : Test Log\n"
       "    body        : Message\n"
       "    resource    : {{key1: 1.1}, {key2: 2.2}, {key3: 3.3}}\n"
-      "    attributes  : {{s1: 10}, {s2: 1}, {s3: 0}}\n"
+      "    attributes  : {{s1: 10}, {s2: true}, {s3: false}}\n"
       "    trace_id    : 00000000000000000000000000000000\n"
       "    span_id     : 0000000000000000\n"
       "    trace_flags : 00\n"
@@ -245,7 +245,7 @@ TEST(OStreamLogExporter, IntegrationTest)
       "    timestamp   : " +
       std::to_string(now.time_since_epoch().count()) +
       "\n"
-      "    severity    : 9\n"
+      "    severity    : kInfo\n"
       "    name        : Name\n"
       "    body        : Message\n"
       "    resource    : {}\n"

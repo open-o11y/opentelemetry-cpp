@@ -22,15 +22,59 @@ namespace logs
  */
 class OStreamLogExporter final : public sdklogs::LogExporter
 {
-private:
-  void print_value(common::AttributeValue &value)
-  {
+public:
+  /**
+   * Create an OStreamLogExporter. This constructor takes in a reference to an ostream that the
+   * Export() method will send log data into. The default ostream is set to stdout.
+   */
+  explicit OStreamLogExporter(std::ostream &sout = std::cout) noexcept;
 
-    // Based off api/include/opentelemetry/common/attribute_value.h
+  /*********************** Overloads of LogExporter interface *********************/
+
+  /**
+   * Exports a span of logs sent from the processor.
+   */
+  sdklogs::ExportResult Export(const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>
+                                   &records) noexcept override;
+
+  /**
+   * Marks the OStream Log Exporter as shut down.
+   */
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+
+private:
+  // The OStream to send the logs to
+  std::ostream &sout_;
+  // Whether this exporter is ShutDown
+  bool isShutdown_ = false;
+
+  /**
+   * Internal map of the severity number (from 0 to 24) to severity text, matching the
+   * values set by the default Severity enum in api/include/opentelemetry/logs/log_record.h
+   *
+   * If more than one exporter requires this, could move this to Severity enum.
+   */
+  const nostd::string_view severityNumToText[25] = {
+      "kInvalid", "kTrace",  "kTrace2", "kTrace3", "kTrace4", "kDebug",  "kDebug2",
+      "kDebug3",  "kDebug4", "kInfo",   "kInfo2",  "kInfo3",  "kInfo4",  "kWarn",
+      "kWarn2",   "kWarn3",  "kWarn4",  "kError",  "kError2", "kError3", "kError4",
+      "kFatal",   "kFatal2", "kFatal3", "kFatal4"};
+
+  /**
+   * Helper function to print a KeyValueIterable. Outputs a AttributeValue type.
+   *
+   * Based off api/include/opentelemetry/common/attribute_value.h
+   * In the future, may be better to add operator overloads to attribute_value.h
+   * to make more maintainable.
+   *
+   */
+  void print_value(const common::AttributeValue &value)
+  {
     switch (value.index())
     {
       case common::AttributeType::TYPE_BOOL:
-        sout_ << nostd::get<bool>(value);
+        sout_ << (nostd::get<bool>(value) ? "true" : "false");
         break;
       case common::AttributeType::TYPE_INT:
         sout_ << nostd::get<int>(value);
@@ -82,7 +126,11 @@ private:
     }
   }
 
-  void printKV(nostd::string_view &key, common::AttributeValue &value)
+  /**
+   * Helper function to print a KeyValueIterable.
+   * Outputs a <Key, Value> pair of type <string_view, AttributeValue>
+   */
+  void printKV(bool &firstKV, const nostd::string_view &key, const common::AttributeValue &value)
   {
     if (firstKV)
     {
@@ -97,32 +145,6 @@ private:
     print_value(value);
     sout_ << "}";
   }
-
-public:
-  /**
-   * Create an OStreamLogExporter. This constructor takes in a reference to an ostream that the
-   * export() function will send log data into.
-   * The default ostream is set to stdout
-   */
-  explicit OStreamLogExporter(std::ostream &sout = std::cout) noexcept;
-  sdklogs::ExportResult Export(const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>
-                                   &records) noexcept override;
-
-  bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
-
-private:
-  std::ostream &sout_;
-  bool isShutdown_ = false;
-  bool firstKV     = true;
-
-  // Mapping severity number to severity text from api/include/opentelemetry/logs/log_record.h
-  const std::map<int, std::string> severityMap{
-      {1, "kTrace"},  {2, "kTrace2"},  {3, "kTrace3"},  {4, "kTrace4"},  {5, "kDebug"},
-      {6, "kDebug2"}, {7, "kDebug3"},  {8, "kDebug4"},  {9, "kInfo"},    {10, "kInfo2"},
-      {11, "kInfo3"}, {12, "kInfo4"},  {13, "kWarn"},   {14, "kWarn2"},  {15, "kWarn3"},
-      {16, "kWarn4"}, {17, "kError"},  {18, "kError2"}, {19, "kError3"}, {20, "kError4"},
-      {21, "kFatal"}, {22, "kFatal2"}, {23, "kFatal3"}, {24, "kFatal4"}};
 };
 }  // namespace logs
 }  // namespace exporter
