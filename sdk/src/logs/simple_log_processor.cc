@@ -57,17 +57,8 @@ bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-/**
- * TODO: This method should not block indefinitely. Should abort within timeout.
- */
 bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  if (timeout < std::chrono::microseconds(0))
-  {
-    // TODO: alert caller of invalid timeout?
-    return false;
-  }
-
   // Should only shutdown exporter ONCE.
   if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
   {

@@ -11,7 +11,6 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         "//sdk/src/logs",
-        "//sdk/src/trace",
     ],
 )
 
