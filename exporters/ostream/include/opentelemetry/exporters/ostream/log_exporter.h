@@ -23,6 +23,65 @@ namespace logs
 class OStreamLogExporter final : public sdklogs::LogExporter
 {
 private:
+  void print_value(common::AttributeValue &value)
+  {
+
+    // Based off api/include/opentelemetry/common/attribute_value.h
+    switch (value.index())
+    {
+      case common::AttributeType::TYPE_BOOL:
+        sout_ << nostd::get<bool>(value);
+        break;
+      case common::AttributeType::TYPE_INT:
+        sout_ << nostd::get<int>(value);
+        break;
+      case common::AttributeType::TYPE_INT64:
+        sout_ << nostd::get<int64_t>(value);
+        break;
+      case common::AttributeType::TYPE_UINT:
+        sout_ << nostd::get<unsigned int>(value);
+        break;
+      case common::AttributeType::TYPE_UINT64:
+        sout_ << nostd::get<uint64_t>(value);
+        break;
+      case common::AttributeType::TYPE_DOUBLE:
+        sout_ << nostd::get<double>(value);
+        break;
+      case common::AttributeType::TYPE_STRING:
+      case common::AttributeType::TYPE_CSTRING:
+        sout_ << nostd::get<nostd::string_view>(value);
+        break;
+
+        /*** Need to support these? ***/
+        // case common::AttributeType::TYPE_SPAN_BOOL:
+        //   sout_ << nostd::get<nostd::span<const bool>>(value);
+        //   break;
+        // case common::AttributeType::TYPE_SPAN_INT:
+        //   sout_ << nostd::get<nostd::span<const int>>(value);
+        //   break;
+        // case common::AttributeType::TYPE_SPAN_INT64:
+        //   sout_ << nostd::get<nostd::span<const int64_t>>(value);
+        //   break;
+        // case common::AttributeType::TYPE_SPAN_UINT:
+        //   sout_ << nostd::get<nostd::span<const unsigned int>>(value);
+        //   break;
+        // case common::AttributeType::TYPE_SPAN_UINT64:
+        //   sout_ << nostd::get<nostd::span<const uint64_t>>(value);
+        //   break;
+        // case common::AttributeType::TYPE_SPAN_DOUBLE:
+        //   sout_ << nostd::get<nostd::span<const double>>(value);
+        //   break;
+        // case common::AttributeType::TYPE_SPAN_STRING:
+        //   sout_ << nostd::get<nostd::span<const nostd::string_view>>(value);
+        //   break;
+        /******** Up to here ************/
+
+      default:
+        sout_ << "Invalid type";
+        break;
+    }
+  }
+
   void printKV(nostd::string_view &key, common::AttributeValue &value)
   {
     if (firstKV)
@@ -34,7 +93,9 @@ private:
       sout_ << ", ";
     }
 
-    sout_ << "{" << key << ": " << nostd::get<nostd::string_view>(value) << "}";
+    sout_ << "{" << key << ": ";
+    print_value(value);
+    sout_ << "}";
   }
 
 public:
