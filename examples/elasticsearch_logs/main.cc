@@ -2,12 +2,13 @@
 #include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/logger.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/sdk/logs/batch_log_processor.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 
 
 namespace sdklogs  = opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
+namespace logs_exporter = opentelemetry::exporter::logs;
 
 
 namespace
@@ -15,12 +16,11 @@ namespace
 
 void initLogger()
 {
-  auto ES_exporter = new opentelemetry::exporter::logs::ElasticsearchLogExporter("localhost", 3000);
-  ES_exporter->SetURI("users");
+  logs_exporter::ElasticsearchExporterOptions options("localhost", 9200, "logs");
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(ES_exporter);
+      std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
   auto processor =
-      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::BatchLogProcessor(std::move(exporter)));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
   auto apiProvider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(sdkProvider);
@@ -40,9 +40,8 @@ void CreateLogs(const int kNumLogs)
 {
   for (int i = 1; i <= kNumLogs; i++)
   {
-    get_logger()->log("Log");
-
-    // get_logger()->log("Log " + std::to_string(i));
+    get_logger()->log("Log hello");
+    //get_logger()->log("Log " + std::to_string(i));
   }
 }
 }  // namespace
