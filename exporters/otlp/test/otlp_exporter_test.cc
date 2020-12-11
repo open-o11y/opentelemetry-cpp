@@ -1,8 +1,16 @@
+<<<<<<< HEAD:exporters/otlp/test/otlp_exporter_test.cc
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
+=======
+#include "opentelemetry/exporters/otlp/otlp_log_exporter.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/simple_log_processor.h"
+>>>>>>> Add OTLP Exporter for logs:exporters/otlp/test/otlp_log_exporter_test.cc
 
 #include <gtest/gtest.h>
 
