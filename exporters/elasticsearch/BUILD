@@ -9,7 +9,7 @@ cc_library(
         "include/opentelemetry/exporters/elasticsearch/es_log_exporter.h",
     ],
     copts = [
-         "-DCURL_STATICLIB",
+        "-DCURL_STATICLIB",
     ],
     linkopts = select({
         "//bazel:windows": [
