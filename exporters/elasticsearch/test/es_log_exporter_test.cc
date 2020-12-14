@@ -14,88 +14,8 @@ namespace logs_api      = opentelemetry::logs;
 namespace nostd         = opentelemetry::nostd;
 namespace logs_exporter = opentelemetry::exporter::logs;
 
-#define HTTP_PORT 19000
-
-/**
-* Create a class that mocks an elasticsearch instance
-*/ 
-class ElasticsearchLogsExporterTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
-{
-protected:
-   HTTP_SERVER_NS::HttpServer server_;
-   std::string server_address_;
-   std::atomic<bool> is_setup_;
-   std::atomic<bool> is_running_;
-   std::vector<HTTP_SERVER_NS::HttpRequest> received_requests_;
-   std::mutex mtx_requests;
-   std::condition_variable cv_got_events;
-   std::mutex cv_m;
-
-public:
-   ElasticsearchLogsExporterTests() : is_setup_(false), is_running_(false){};
-
-    virtual void SetUp() override
-   {
-     if (is_setup_.exchange(true))
-     {
-       return;
-     }
-     int port = server_.addListeningPort(HTTP_PORT);
-     std::ostringstream os;
-     os << "localhost:" << port;
-     server_address_ = "http://" + os.str() + "/simple/";
-     server_.setServerName(os.str());
-     server_.setKeepalive(false);
-     server_.addHandler("/logs/", *this);
-     server_.addHandler("/get/", *this);
-     server_.addHandler("/post/", *this);
-     server_.start();
-     is_running_ = true;
-   }
-
-    virtual void TearDown() override
-   {
-     if (!is_setup_.exchange(false))
-       return;
-     server_.stop();
-     is_running_ = false;
-   }
-
-    virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
-                             HTTP_SERVER_NS::HttpResponse &response) override
-   {
-     // Default uri for Elasticsearch instance
-     if (request.uri == "/logs/_bulk?pretty")
-     {
-      // Reject a request if name = "BadRecord!"
-      if(request.content.find("\"name\":\"Bad Record!\"") != std::string::npos)
-      {
-       std::unique_lock<std::mutex> lk(mtx_requests);
-       received_requests_.push_back(request);
-       response.headers["Content-Type"] = "application/json";
-       response.body                    = "{\"failed\" : 1}";
-       return 200;
-      }
-
-      // Accept any other request
-      std::unique_lock<std::mutex> lk(mtx_requests);
-      received_requests_.push_back(request);
-      response.headers["Content-Type"] = "application/json";
-      response.body                    = "{\"failed\" : 0}";
-      return 200;
-     }
-     // Accept any other request
-      std::unique_lock<std::mutex> lk(mtx_requests);
-      received_requests_.push_back(request);
-      response.headers["Content-Type"] = "application/json";
-      response.body                    = "body: " + request.content;
-
-     return 404;
-   }
- };
-
 // Attempt to write a log to an invalid host/port, test that the timeout works properly
-TEST_F(ElasticsearchLogsExporterTests, InvalidEndpoint)
+TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 {
   // Create options for the elasticsearch exporter
   logs_exporter::ElasticsearchExporterOptions options("localhost", -1, "logs", 5, true);
@@ -124,7 +44,7 @@ TEST_F(ElasticsearchLogsExporterTests, InvalidEndpoint)
 }
 
 // Test that when the exporter is shutdown, any call to Export should return failure
-TEST_F(ElasticsearchLogsExporterTests, Shutdown)
+TEST(ElasticsearchLogsExporterTests, Shutdown)
 {
   // Create an elasticsearch exporter and immediately shut it down
   auto exporter =
@@ -138,48 +58,4 @@ TEST_F(ElasticsearchLogsExporterTests, Shutdown)
 
   // Ensure the return value is failure
   ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
-}
-
-// Write a log to the mock server, and have it return a failure response
-TEST_F(ElasticsearchLogsExporterTests, FailureResponseCode) {
-    // Create an elasticsearch exporter with config options that specify the endpoint
-    //     - host    = localhost
-    //     - port    = HTTP_PORT
-    //     - index   = logs
-    //     - timeout = 5 seconds
-    logs_exporter::ElasticsearchExporterOptions options("localhost", HTTP_PORT, "logs", 5, true);
-    auto exporter =
-        std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
-
-    // Create a recordable with a name that the mock server is programmed to reject
-    auto record = exporter->MakeRecordable();
-    record->SetName("Bad Record!");
-
-    // Send the recordable to the mock server
-    auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
-
-    // Ensure the return value is failure
-    ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
-}
-
-// Write a log to the mock server, and have it return a successful response
-TEST_F(ElasticsearchLogsExporterTests, SuccessResponseCode) {
-    // Create an elasticsearch exporter with config options that specify the endpoint
-    //     - host    = localhost
-    //     - port    = HTTP_PORT
-    //     - index   = logs
-    //     - timeout = 5 seconds
-    logs_exporter::ElasticsearchExporterOptions options("localhost", HTTP_PORT, "logs", 5, true);
-    auto exporter =
-        std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
-
-    // Create a recordable with a name that the mock server is programmed to accept
-    auto record = exporter->MakeRecordable();
-    record->SetName("Good Record!");
-
-    // Send the recordable to the mock server
-    auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
-
-    // Ensure the return value is success
-    ASSERT_EQ(result, sdklogs::ExportResult::kSuccess);
 }
