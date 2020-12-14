@@ -10,7 +10,15 @@ cc_library(
     ],
     copts = [
          "-DCURL_STATICLIB",
-     ],
+    ],
+    linkopts = select({
+        "//bazel:windows": [
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:crypt32.lib",
+            "-DEFAULTLIB:Normaliz.lib",
+        ],
+        "//conditions:default": [],
+    }),
     strip_include_prefix = "include",
     deps = [
         "//ext:headers",
