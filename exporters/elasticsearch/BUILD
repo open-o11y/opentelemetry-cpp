@@ -8,6 +8,9 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/elasticsearch/es_log_exporter.h",
     ],
+    copts = [
+         "-DCURL_STATICLIB",
+     ],
     strip_include_prefix = "include",
     deps = [
         "//ext:headers",
