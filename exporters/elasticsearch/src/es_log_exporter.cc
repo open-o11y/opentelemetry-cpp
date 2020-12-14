@@ -92,8 +92,13 @@ ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOp
     : options_{options}, session_manager_{new ext::http::client::curl::SessionManager()}
 {}
 
+std::unique_ptr<sdklogs::Recordable> ElasticsearchLogExporter::MakeRecordable() noexcept
+{
+  return std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
+}
+
 sdklogs::ExportResult ElasticsearchLogExporter::Export(
-    const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
+    const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   // Return failure if this exporter has been shutdown
   if (isShutdown_)
@@ -190,15 +195,25 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexc
   return true;
 }
 
-json ElasticsearchLogExporter::RecordToJSON(std::unique_ptr<opentelemetry::logs::LogRecord> record)
+json ElasticsearchLogExporter::RecordToJSON(std::unique_ptr<sdklogs::Recordable> record)
 {
   // Create a json object to store the LogRecord information in
   json log;
 
+  // Convert recordable to a LogRecord so that the getters of the LogRecord can be used
+  auto log_record =
+      std::unique_ptr<sdklogs::LogRecord>(static_cast<sdklogs::LogRecord *>(record.release()));
+
+  if (log_record == nullptr)
+  {
+    // Error "recordable data was lost"
+    return log;
+  }
+
   // Write the simple fields
-  log["timestamp"] = record->timestamp.time_since_epoch().count();
-  log["name"]      = record->name;
-  log["body"]      = record->body;
+  log["timestamp"] = log_record->GetTimestamp().time_since_epoch().count();
+  log["name"]      = log_record->GetName();
+  log["body"]      = log_record->GetBody();
 
   // Write the severity by converting it from its enum to a string
   static opentelemetry::nostd::string_view severityStringMap_[25] = {
@@ -206,47 +221,47 @@ json ElasticsearchLogExporter::RecordToJSON(std::unique_ptr<opentelemetry::logs:
       "kDebug3",  "kDebug4", "kInfo",   "kInfo2",  "kInfo3",  "kInfo4",  "kWarn",
       "kWarn2",   "kWarn3",  "kWarn4",  "kError",  "kError2", "kError3", "kError4",
       "kFatal",   "kFatal2", "kFatal3", "kFatal4"};
-  log["severity"] = severityStringMap_[static_cast<int>(record->severity)];
+  log["severity"] = severityStringMap_[static_cast<int>(log_record->GetSeverity())];
 
   // Convert the resources into a JSON object
-  json resource;
-  if (record->resource != nullptr)
-  {
-    record->resource->ForEachKeyValue([&](nostd::string_view key,
-                                          common::AttributeValue value) noexcept {
-      resource[key.data()] = ValueToString(value);
-      return true;
-    });
+  // json resource;
+  // if (record->resource != nullptr)
+  // {
+  //   record->resource->ForEachKeyValue([&](nostd::string_view key,
+  //                                         common::AttributeValue value) noexcept {
+  //     resource[key.data()] = ValueToString(value);
+  //     return true;
+  //   });
 
-    // Push the attributes JSON object into the main JSON under the "resource" key
-    log.push_back({"resource", resource});
-  }
+  //   // Push the attributes JSON object into the main JSON under the "resource" key
+  //   log.push_back({"resource", resource});
+  // }
 
-  // Convert the attributes into a JSON object
-  json attributes;
-  if (record->attributes != nullptr)
-  {
-    record->attributes->ForEachKeyValue([&](nostd::string_view key,
-                                            common::AttributeValue value) noexcept {
-      attributes[key.data()] = ValueToString(value);
-      return true;
-    });
+  // // Convert the attributes into a JSON object
+  // json attributes;
+  // if (record->attributes != nullptr)
+  // {
+  //   record->attributes->ForEachKeyValue([&](nostd::string_view key,
+  //                                           common::AttributeValue value) noexcept {
+  //     attributes[key.data()] = ValueToString(value);
+  //     return true;
+  //   });
 
-    // Push the attributes JSON object into the main JSON under the "attributes" key
-    log.push_back({"attributes", attributes});
-  }
+  //   // Push the attributes JSON object into the main JSON under the "attributes" key
+  //   log.push_back({"attributes", attributes});
+  // }
 
   // Convert traceid, spanid, and traceflags into strings
   char trace_buf[32];
-  record->trace_id.ToLowerBase16(trace_buf);
+  log_record->GetTraceId().ToLowerBase16(trace_buf);
   log["traceid"] = std::string(trace_buf, sizeof(trace_buf));
 
   char span_buf[16];
-  record->span_id.ToLowerBase16(span_buf);
+  log_record->GetSpanId().ToLowerBase16(span_buf);
   log["spanid"] = std::string(span_buf, sizeof(span_buf));
 
   char flag_buf[2];
-  record->trace_flags.ToLowerBase16(flag_buf);
+  log_record->GetTraceFlags().ToLowerBase16(flag_buf);
   log["traceflags"] = std::string(flag_buf, sizeof(flag_buf));
 
   return log;

@@ -18,7 +18,7 @@
 
 #include "nlohmann/json.hpp"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
-#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
@@ -91,11 +91,16 @@ public:
   ElasticsearchLogExporter(const ElasticsearchExporterOptions &options);
 
   /**
+   * Creates a recordable that stores the data in a JSON object
+   */ 
+  std::unique_ptr<sdk::logs::Recordable> MakeRecordable() noexcept override;
+
+  /**
    * Exports a vector of log records to the Elasticsearch instance. Guaranteed to return after a
    * timeout specified from the options passed from the constructor.
    * @param records A list of log records to send to Elasticsearch.
    */
-  sdklogs::ExportResult Export(const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>>
+  sdklogs::ExportResult Export(const nostd::span<std::unique_ptr<sdk::logs::Recordable>>
                                    &records) noexcept override;
 
   /**
@@ -117,7 +122,7 @@ private:
   /**
    * Converts a log record into a nlohmann::json object.
    */
-  json RecordToJSON(std::unique_ptr<opentelemetry::logs::LogRecord> record);
+  json RecordToJSON(std::unique_ptr<sdk::logs::Recordable> record);
 
   /**
    * Converts a common::AttributeValue into a string, which is used for parsing the attributes
