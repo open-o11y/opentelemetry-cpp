@@ -141,7 +141,7 @@ TEST_F(ElasticsearchLogsExporterTests, FailureResponseCode) {
     //     - port    = HTTP_PORT
     //     - index   = logs
     //     - timeout = 5 seconds
-    logs_exporter::ElasticsearchExporterOptions options("localhost", HTTP_PORT, "logs", 5);
+    logs_exporter::ElasticsearchExporterOptions options("localhost", HTTP_PORT, "logs", 5, true);
     auto exporter =
         std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
 
@@ -163,7 +163,7 @@ TEST_F(ElasticsearchLogsExporterTests, SuccessResponseCode) {
     //     - port    = HTTP_PORT
     //     - index   = logs
     //     - timeout = 5 seconds
-    logs_exporter::ElasticsearchExporterOptions options("localhost", HTTP_PORT, "logs", 5);
+    logs_exporter::ElasticsearchExporterOptions options("localhost", HTTP_PORT, "logs", 5, true);
     auto exporter =
         std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
 

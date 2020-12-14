@@ -168,7 +168,6 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
   // Parse the response output to determine if the request wasen't successful
   std::string responseBody = handler->GetResponseBody();
-  std::cout << responseBody << std::endl;
   if (responseBody.find("\"failed\" : 0") == std::string::npos)
   {
     if (options_.console_debug_)
