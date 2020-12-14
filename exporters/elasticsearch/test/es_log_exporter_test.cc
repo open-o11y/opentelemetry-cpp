@@ -84,6 +84,12 @@ public:
       response.body                    = "{\"failed\" : 0}";
       return 200;
      }
+     // Accept any other request
+      std::unique_lock<std::mutex> lk(mtx_requests);
+      received_requests_.push_back(request);
+      response.headers["Content-Type"] = "application/json";
+      response.body                    = "body: " + request.content;
+
      return 404;
    }
  };
