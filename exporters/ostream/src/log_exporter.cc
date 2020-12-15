@@ -30,11 +30,6 @@ OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout
 
 std::unique_ptr<sdklogs::Recordable> OStreamLogExporter::MakeRecordable() noexcept
 {
-  if (is_shutdown_)
-  {
-    return nullptr;
-  }
-
   return std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
 }
 
