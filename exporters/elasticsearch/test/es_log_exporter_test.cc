@@ -28,6 +28,9 @@ TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
   // Create a log record
   auto record = exporter->MakeRecordable();
   record->SetName("Timeout Log");
+  record->SetSeverity(logs_api::Severity::kFatal);
+  record->SetAttribute("key1", "value1");
+  record->SetAttribute("key2", "value2");
 
   // Write the log record to the exporter, and time the duration
   auto t1     = std::chrono::high_resolution_clock::now();

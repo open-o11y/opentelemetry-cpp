@@ -118,47 +118,6 @@ private:
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<ext::http::client::SessionManager> session_manager_;
-
-  /**
-   * Converts a log record into a nlohmann::json object.
-   */
-  json RecordToJSON(std::unique_ptr<sdk::logs::Recordable> record);
-
-  /**
-   * Converts a common::AttributeValue into a string, which is used for parsing the attributes
-   * and resource KeyValueIterables
-   */
-  const std::string ValueToString(const common::AttributeValue &value)
-  {
-    switch (value.index())
-    {
-      case common::AttributeType::TYPE_BOOL:
-        return (opentelemetry::nostd::get<bool>(value) ? "true" : "false");
-        break;
-      case common::AttributeType::TYPE_INT:
-        return std::to_string(opentelemetry::nostd::get<int>(value));
-        break;
-      case common::AttributeType::TYPE_INT64:
-        return std::to_string(opentelemetry::nostd::get<int64_t>(value));
-        break;
-      case common::AttributeType::TYPE_UINT:
-        return std::to_string(opentelemetry::nostd::get<unsigned int>(value));
-        break;
-      case common::AttributeType::TYPE_UINT64:
-        return std::to_string(opentelemetry::nostd::get<uint64_t>(value));
-        break;
-      case common::AttributeType::TYPE_DOUBLE:
-        return std::to_string(opentelemetry::nostd::get<double>(value));
-        break;
-      case common::AttributeType::TYPE_STRING:
-      case common::AttributeType::TYPE_CSTRING:
-        return opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-        break;
-      default:
-        return "Invalid type";
-        break;
-    }
-  }
 };
 }  // namespace logs
 }  // namespace exporter
