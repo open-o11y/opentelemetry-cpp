@@ -211,10 +211,7 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 
 BatchLogProcessor::~BatchLogProcessor()
 {
-  if (is_shutdown_.load() == false)
-  {
-    Shutdown();
-  }
+  Shutdown();
 }
 
 }  // namespace logs
