@@ -26,88 +26,87 @@ namespace exporter
 {
 namespace logs
 {
-  /*********************************** Helper functions ************************/
+/*********************************** Helper functions ************************/
 
-  /*
-    print_value is used to print out the value of an attribute within a vector.
-    These values are held in a variant which makes the process of printing them much more
-    complicated.
-  */
+/*
+  print_value is used to print out the value of an attribute within a vector.
+  These values are held in a variant which makes the process of printing them much more
+  complicated.
+*/
 
-  template <typename T>
-  void print_value(const T &item, std::ostream& sout)
+template <typename T>
+void print_value(const T &item, std::ostream &sout)
+{
+  sout << item;
+}
+
+template <typename T>
+void print_value(const std::vector<T> &vec, std::ostream &sout)
+{
+  sout << '[';
+  size_t i  = 1;
+  size_t sz = vec.size();
+  for (auto v : vec)
   {
-    sout << item;
-  }
-
-  template <typename T>
-  void print_value(const std::vector<T> &vec, std::ostream& sout)
-  {
-    sout << '[';
-    size_t i  = 1;
-    size_t sz = vec.size();
-    for (auto v : vec)
-    {
-      sout << v;
-      if (i != sz)
-        sout << ',' << ' ';
-      i++;
-    };
-    sout << ']';
-  }
+    sout << v;
+    if (i != sz)
+      sout << ',' << ' ';
+    i++;
+  };
+  sout << ']';
+}
 
 // Prior to C++14, generic lambda is not available so fallback to functor.
 #if __cplusplus < 201402L
 
-  class OwnedAttributeValueVisitor
+class OwnedAttributeValueVisitor
+{
+public:
+  OwnedAttributeValueVisitor(std::ostream &sout) : sout_(sout) {}
+
+  template <typename T>
+  void operator()(T &&arg)
   {
-  public:
-    OwnedAttributeValueVisitor(std::ostream&sout) :  sout_(sout) {}
+    print_value(arg, sout_);
+  }
 
-    template <typename T>
-    void operator()(T &&arg)
-    {
-      print_value(arg, sout_);
-    }
-
-  private:
-    // The OStream to send the logs to
-    std::ostream &sout_;
-
-  };
+private:
+  // The OStream to send the logs to
+  std::ostream &sout_;
+};
 
 #endif
 
-  void print_value(sdk::common::OwnedAttributeValue &value, std::ostream& sout)
-  {
+void print_value(sdk::common::OwnedAttributeValue &value, std::ostream &sout)
+{
 #if __cplusplus < 201402L
-    nostd::visit(OwnedAttributeValueVisitor(sout), value);
+  nostd::visit(OwnedAttributeValueVisitor(sout), value);
 #else
-    nostd::visit([this](auto &&arg) { print_value(arg, sout); }, value);
+  nostd::visit([this](auto &&arg) { print_value(arg, sout); }, value);
 #endif
-  }
+}
 
-  void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map, std::ostream & sout)
+void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map,
+              std::ostream &sout)
+{
+  sout << "{";
+  size_t size = map.size();
+  size_t i    = 1;
+  for (auto kv : map)
   {
-    sout << "{";
-    size_t size = map.size();
-    size_t i    = 1;
-    for (auto kv : map)
-    {
-      sout << "{" << kv.first << ": ";
-      print_value(kv.second, sout);
-      sout << "}";
-
-      if (i != size)
-        sout << ", ";
-      i++;
-    }
+    sout << "{" << kv.first << ": ";
+    print_value(kv.second, sout);
     sout << "}";
+
+    if (i != size)
+      sout << ", ";
+    i++;
   }
+  sout << "}";
+}
 /***********************  Constructor ***********************/
 
 OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout) {}
-
 
 /***********************  LogExporter overloaded methods ***********************/
 
