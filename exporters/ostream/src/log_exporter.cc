@@ -26,7 +26,7 @@ namespace exporter
 {
 namespace logs
 {
-/*********************************** Helper functions ************************/
+/*********************** Helper functions ************************/
 
 /*
   print_value is used to print out the value of an attribute within a vector.
@@ -104,11 +104,12 @@ void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> 
   }
   sout << "}";
 }
-/***********************  Constructor ***********************/
+
+/*********************** Constructor ***********************/
 
 OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
-/***********************  LogExporter overloaded methods ***********************/
+/*********************** Exporter methods ***********************/
 
 std::unique_ptr<sdklogs::Recordable> OStreamLogExporter::MakeRecordable() noexcept
 {
