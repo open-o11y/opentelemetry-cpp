@@ -62,16 +62,18 @@ namespace logs
   class OwnedAttributeValueVisitor
   {
   public:
-    OwnedAttributeValueVisitor(OStreamLogExporter &exporter) : exporter_(exporter) {}
+    OwnedAttributeValueVisitor(std::ostream&sout) :  sout_(sout) {}
 
     template <typename T>
     void operator()(T &&arg)
     {
-      exporter_.print_value(arg);
+      print_value(arg, sout_);
     }
 
   private:
-    OStreamLogExporter &exporter_;
+    // The OStream to send the logs to
+    std::ostream &sout_;
+
   };
 
 #endif
@@ -79,13 +81,13 @@ namespace logs
   void print_value(sdk::common::OwnedAttributeValue &value, std::ostream& sout)
   {
 #if __cplusplus < 201402L
-    nostd::visit(OwnedAttributeValueVisitor(*this), value);
+    nostd::visit(OwnedAttributeValueVisitor(sout), value);
 #else
-    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+    nostd::visit([this](auto &&arg) { print_value(arg, sout); }, value);
 #endif
   }
 
-  void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map)
+  void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map, std::ostream & sout)
   {
     sout << "{";
     size_t size = map.size();
@@ -93,7 +95,7 @@ namespace logs
     for (auto kv : map)
     {
       sout << "{" << kv.first << ": ";
-      print_value(kv.second);
+      print_value(kv.second, sout);
       sout << "}";
 
       if (i != size)
