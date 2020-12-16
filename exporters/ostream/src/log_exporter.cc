@@ -82,7 +82,7 @@ void print_value(sdk::common::OwnedAttributeValue &value, std::ostream &sout)
 #if __cplusplus < 201402L
   nostd::visit(OwnedAttributeValueVisitor(sout), value);
 #else
-  nostd::visit([](auto &&arg) { print_value(arg, sout); }, value);
+  nostd::visit([&sout](auto &&arg) { print_value(arg, sout); }, value);
 #endif
 }
 
