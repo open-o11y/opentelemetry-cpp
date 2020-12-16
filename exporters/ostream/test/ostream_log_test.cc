@@ -19,7 +19,8 @@ namespace logs
 // Test that when OStream Log exporter is shutdown, no logs should be sent to stream
 TEST(OStreamLogExporter, Shutdown)
 {
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+  auto exporter =
+      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -31,7 +32,7 @@ TEST(OStreamLogExporter, Shutdown)
   EXPECT_TRUE(exporter->Shutdown());
 
   // After processor/exporter is shutdown, no logs should be sent to stream
-  auto record = exporter->MakeRecordable(); 
+  auto record = exporter->MakeRecordable();
   record->SetBody("Log record not empty");
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
@@ -49,7 +50,6 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
 {
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
       new opentelemetry::exporter::logs::OStreamLogExporter(std::cout));
- 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
 
@@ -81,12 +81,14 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
   ASSERT_EQ(output.str(), expectedOutput);
 }
 
-// Testing what a log record with only the "timestamp", "severity", "name" and "message" fields set, will print out
+// Testing what a log record with only the "timestamp", "severity", "name" and "message" fields set,
+// will print out
 TEST(OStreamLogExporter, SimpleLogToCout)
 {
   // Initialize an Ostream exporter to std::cout
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter(std::cout));
- 
+  auto exporter = std::unique_ptr<sdklogs::LogExporter>(
+      new opentelemetry::exporter::logs::OStreamLogExporter(std::cout));
+
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cout.rdbuf();
   std::stringstream output;
@@ -98,7 +100,7 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
   auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
   record->SetTimestamp(now);
-  record->SetSeverity(logs_api::Severity::kTrace); // kTrace has enum value of 1
+  record->SetSeverity(logs_api::Severity::kTrace);  // kTrace has enum value of 1
   record->SetName("Name");
   record->SetBody("Message");
 
@@ -128,13 +130,14 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
 // ---------------------------------- Print to cerr --------------------------
 
-// Testing what a log record with only the "resource" and "attributes" fields 
+// Testing what a log record with only the "resource" and "attributes" fields
 // (i.e. KeyValueIterable types) set with primitive types, will print out
 TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
 {
   // Initialize an Ostream exporter to cerr
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter(std::cerr));
- 
+  auto exporter = std::unique_ptr<sdklogs::LogExporter>(
+      new opentelemetry::exporter::logs::OStreamLogExporter(std::cerr));
+
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cerr.rdbuf();
   std::stringstream stdcerrOutput;
@@ -173,14 +176,15 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
 
 // ---------------------------------- Print to clog -------------------------
 
-// Testing what a log record with only the "resource", and "attributes" fields 
+// Testing what a log record with only the "resource", and "attributes" fields
 // (i.e. KeyValueIterable types), set with 2D arrays as values, will print out
 TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 {
-  
+
   // Initialize an Ostream exporter to cerr
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter(std::clog));
- 
+  auto exporter = std::unique_ptr<sdklogs::LogExporter>(
+      new opentelemetry::exporter::logs::OStreamLogExporter(std::clog));
+
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::clog.rdbuf();
   std::stringstream stdclogOutput;
@@ -197,7 +201,7 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
   // Set resources for this log record of bool types as the value
   // e.g. key/value is a par of type <string, array of bools>
   std::array<bool, 3> array = {false, true, false};
-  record->SetAttribute("attr1",  opentelemetry::nostd::span<bool> {array.data(), array.size()});
+  record->SetAttribute("attr1", opentelemetry::nostd::span<bool>{array.data(), array.size()});
 
   // Log a record to clog
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
@@ -219,12 +223,11 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
       "  trace_flags   : 00\n"
       "}\n";
   ASSERT_EQ(stdclogOutput.str(), expectedOutput);
-
 }
 
 // // ---------------------------------- Integration Tests -------------------------
 
-// Test using the simple log processor and ostream exporter to cout 
+// Test using the simple log processor and ostream exporter to cout
 // and use the rest of the logging pipeline (Logger, LoggerProvider, Provider) as well
 TEST(OStreamLogExporter, IntegrationTest)
 {
@@ -255,7 +258,7 @@ TEST(OStreamLogExporter, IntegrationTest)
   std::cout.rdbuf(original);
 
   // Compare actual vs expected outputs
-std::string expectedOutput =
+  std::string expectedOutput =
       "{\n"
       "  timestamp     : " +
       std::to_string(now.time_since_epoch().count()) +
@@ -270,10 +273,9 @@ std::string expectedOutput =
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
       "}\n";
-      "}\n";
+  "}\n";
 
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
-
 }
 
 }  // namespace logs
