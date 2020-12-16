@@ -26,7 +26,88 @@ namespace exporter
 {
 namespace logs
 {
+  /*********************************** Helper functions ************************/
+
+  /*
+    print_value is used to print out the value of an attribute within a vector.
+    These values are held in a variant which makes the process of printing them much more
+    complicated.
+  */
+
+  template <typename T>
+  void print_value(const T &item, std::ostream& sout)
+  {
+    sout << item;
+  }
+
+  template <typename T>
+  void print_value(const std::vector<T> &vec, std::ostream& sout)
+  {
+    sout << '[';
+    size_t i  = 1;
+    size_t sz = vec.size();
+    for (auto v : vec)
+    {
+      sout_ << v;
+      if (i != sz)
+        sout_ << ',' << ' ';
+      i++;
+    };
+    sout << ']';
+  }
+
+// Prior to C++14, generic lambda is not available so fallback to functor.
+#if __cplusplus < 201402L
+
+  class OwnedAttributeValueVisitor
+  {
+  public:
+    OwnedAttributeValueVisitor(OStreamLogExporter &exporter) : exporter_(exporter) {}
+
+    template <typename T>
+    void operator()(T &&arg)
+    {
+      exporter_.print_value(arg);
+    }
+
+  private:
+    OStreamLogExporter &exporter_;
+  };
+
+#endif
+
+  void print_value(sdk::common::OwnedAttributeValue &value, std::ostream& sout)
+  {
+#if __cplusplus < 201402L
+    nostd::visit(OwnedAttributeValueVisitor(*this), value);
+#else
+    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+#endif
+  }
+
+  void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map)
+  {
+    sout << "{";
+    size_t size = map.size();
+    size_t i    = 1;
+    for (auto kv : map)
+    {
+      sout << "{" << kv.first << ": ";
+      print_value(kv.second);
+      sout << "}";
+
+      if (i != size)
+        sout_ << ", ";
+      i++;
+    }
+    sout << "}";
+  }
+/***********************  Constructor ***********************/
+
 OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout) {}
+
+
+/***********************  LogExporter overloaded methods ***********************/
 
 std::unique_ptr<sdklogs::Recordable> OStreamLogExporter::MakeRecordable() noexcept
 {
@@ -78,12 +159,12 @@ sdklogs::ExportResult OStreamLogExporter::Export(
           << "  body          : " << log_record->GetBody() << "\n"
           << "  resource      : ";
 
-    printMap(log_record->GetResource());
+    printMap(log_record->GetResource(), sout_);
 
     sout_ << "\n"
           << "  attributes    : ";
 
-    printMap(log_record->GetAttributes());
+    printMap(log_record->GetAttributes(), sout_);
 
     sout_ << "\n"
           << "  trace_id      : " << std::string(trace_id, trace_id_len) << "\n"
