@@ -191,6 +191,8 @@ void BatchLogProcessor::DrainQueue()
 // Note: Timeout functionality is currently not implemented
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  std::unique_lock<std::mutex> lock(shutdown_mutex_);
+
   // Atomically checking whether value of is_shutdown_ is false
   // and setting it to true
   if (is_shutdown_.exchange(true) == false)
