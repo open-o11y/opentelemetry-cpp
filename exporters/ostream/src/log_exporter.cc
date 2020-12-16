@@ -48,9 +48,9 @@ namespace logs
     size_t sz = vec.size();
     for (auto v : vec)
     {
-      sout_ << v;
+      sout << v;
       if (i != sz)
-        sout_ << ',' << ' ';
+        sout << ',' << ' ';
       i++;
     };
     sout << ']';
@@ -99,7 +99,7 @@ namespace logs
       sout << "}";
 
       if (i != size)
-        sout_ << ", ";
+        sout << ", ";
       i++;
     }
     sout << "}";
