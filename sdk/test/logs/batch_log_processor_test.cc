@@ -158,7 +158,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   }
 
   // Give some time to export
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  // std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   batch_processor->ForceFlush();
 
@@ -177,7 +177,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   }
 
   // Give some time to export the logs
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  // std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   batch_processor->ForceFlush();
 
@@ -209,7 +209,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
   }
 
   // Give some time to export the logs
-  std::this_thread::sleep_for(std::chrono::milliseconds(700));
+  // std::this_thread::sleep_for(std::chrono::milliseconds(700));
 
   batch_processor->ForceFlush();
 
@@ -270,10 +270,10 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
     batch_processor->OnReceive(std::move(log));
   }
   // Sleep for schedule_delay_millis milliseconds
-  std::this_thread::sleep_for(schedule_delay_millis);
+  // std::this_thread::sleep_for(schedule_delay_millis);
 
   // small delay to give time to export
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  // std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   // Logs should be exported by now
   EXPECT_TRUE(is_export_completed->load());
