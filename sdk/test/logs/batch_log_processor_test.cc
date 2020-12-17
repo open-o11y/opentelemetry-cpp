@@ -274,8 +274,8 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   std::this_thread::sleep_for(schedule_delay_millis);
 
   // small delay to give time to export, which is being performed
-  // asynchronously by the worker thread (this thread will not be
-  // forcibly join() the thread unless shutdown() is called.  
+  // asynchronously by the worker thread (this thread will not
+  // forcibly join() the main thread unless processor's shutdown() is called.  
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   // Logs should be exported by now
