@@ -50,7 +50,6 @@ public:
       const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
   {
     *is_export_completed_ = false;               // Meant exclusively to test force flush timeout
-    // std::this_thread::sleep_for(export_delay_);  // give time for the "export" to complete
 
     for (auto &record : records)
     {
@@ -157,9 +156,6 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
     batch_processor->OnReceive(std::move(log));
   }
 
-  // Give some time to export
-  // std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
   batch_processor->ForceFlush();
 
   EXPECT_EQ(num_logs, logs_received->size());
@@ -175,9 +171,6 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
     log->SetName("Log" + std::to_string(i));
     batch_processor->OnReceive(std::move(log));
   }
-
-  // Give some time to export the logs
-  // std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   batch_processor->ForceFlush();
 
@@ -208,9 +201,6 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
     batch_processor->OnReceive(std::move(log));
   }
 
-  // Give some time to export the logs
-  // std::this_thread::sleep_for(std::chrono::milliseconds(700));
-
   batch_processor->ForceFlush();
 
   // Log should be exported by now
@@ -236,7 +226,6 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
   }
 
   // Give some time to export the logs
-
   batch_processor->ForceFlush();
 
   EXPECT_EQ(num_logs, logs_received->size());
@@ -270,10 +259,7 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
     batch_processor->OnReceive(std::move(log));
   }
   // Sleep for schedule_delay_millis milliseconds
-  // std::this_thread::sleep_for(schedule_delay_millis);
-
-  // small delay to give time to export
-  // std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  std::this_thread::sleep_for(schedule_delay_millis);
 
   // Logs should be exported by now
   EXPECT_TRUE(is_export_completed->load());
