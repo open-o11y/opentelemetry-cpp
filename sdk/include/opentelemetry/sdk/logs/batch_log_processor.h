@@ -86,7 +86,7 @@ public:
   /**
    * Class destructor which invokes the Shutdown() method.
    */
-  ~BatchLogProcessor();
+  virtual ~BatchLogProcessor() override;
 
 private:
   /**
