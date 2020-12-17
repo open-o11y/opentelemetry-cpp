@@ -273,8 +273,10 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   // Sleep for schedule_delay_millis milliseconds
   std::this_thread::sleep_for(schedule_delay_millis);
 
-  // small delay to give time to export
-  //std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  // small delay to give time to export, which is being performed
+  // asynchronously by the worker thread (this thread will not be
+  // forcibly join() the thread unless shutdown() is called.  
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   // Logs should be exported by now
   EXPECT_TRUE(is_export_completed->load());
