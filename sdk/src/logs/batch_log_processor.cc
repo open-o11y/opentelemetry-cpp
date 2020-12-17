@@ -158,7 +158,7 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
         buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
   }
 
-  // Put the records into a circular buffer
+  // Get records from the circular buffer and put into a vector
   std::vector<std::unique_ptr<Recordable>> records_arr;
 
   buffer_.Consume(
@@ -171,6 +171,7 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
         });
       });
 
+  // Call exporter with the records, and get export status 
   if (exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size())) != ExportResult::kSuccess)
   {
     // Indicate Error: "[Batch Log Processor]: Failed to export a batch"
