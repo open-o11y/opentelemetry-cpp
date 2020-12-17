@@ -176,8 +176,8 @@ void BatchLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
 /**
  * Notifies the worker thread that ForceFlush() has been called,
  * and waits for worker to complete the force flush.
- * 
- * Note: timeout functionality is currently not implemented. 
+ *
+ * Note: timeout functionality is currently not implemented.
  */
 bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
