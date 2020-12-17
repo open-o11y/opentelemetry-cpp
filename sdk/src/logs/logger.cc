@@ -101,7 +101,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   }
   else if (span_context.span_id().IsValid())
   {
-    recordable->SetSpanId(span_id);
+    recordable->SetSpanId(span_context.span_id());
   }
 
   // Traceflags

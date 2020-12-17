@@ -202,6 +202,11 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     return sdklogs::ExportResult::kFailure;
   }
 
+  if (options_.console_debug_)
+    {
+      std::cout << "[Success] Logs were written to Elasticsearch." << std::endl;
+    }
+
   return sdklogs::ExportResult::kSuccess;
 }
 
