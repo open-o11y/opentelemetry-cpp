@@ -176,7 +176,10 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
   {
     is_force_flush_notified_.store(true);
     // Notifies the thread
-    force_flush_cv_.notify_one();
+    while (is_force_flush_notified_.load() == true)
+    {
+      force_flush_cv_.notify_one();
+    }
   }
 }
 
