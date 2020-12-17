@@ -89,8 +89,17 @@ bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
+
+void BatchLogProcessor::DrainQueue()
+{
+  while (buffer_.empty() == false)
+  {
+    Export(false);
+  }
+}
+
 // Note this thread will only be called once by the worker thread (which there is only 1 of)
-// in the constructor,  thus it will not be called concurently.
+// in the constructor, thus it will not be called concurently.
 void BatchLogProcessor::DoBackgroundWork()
 {
   auto timeout = schedule_delay_millis_;
@@ -101,31 +110,24 @@ void BatchLogProcessor::DoBackgroundWork()
     std::unique_lock<std::mutex> lk(cv_m_);
     cv_.wait_for(lk, timeout);
 
+    // Check if shutown was called, drain queue 
     if (is_shutdown_.load() == true)
     {
       DrainQueue();
       return;
     }
 
-    bool was_force_flush_called = is_force_flush_.load();
+    // Check if ForceFlush was called, notify main thread that worker thread has been notified
+    bool was_force_flush_called = is_force_flush_.exchange(false);
 
-    // Check if this export was the result of a force flush.
-    if (was_force_flush_called == true)
+    
+    // If the buffer was empty during the entire `timeout` time interval,
+    // go back to waiting. If this was a spurious wake-up, we export only if
+    // `buffer_` is not empty. This is acceptable because batching is a best
+    // mechanism effort here.
+    if (buffer_.empty() == true)
     {
-      // Since this export was the result of a force flush, signal the
-      // main thread that the worker thread has been notified
-      is_force_flush_.store(false);
-    }
-    else
-    {
-      // If the buffer was empty during the entire `timeout` time interval,
-      // go back to waiting. If this was a spurious wake-up, we export only if
-      // `buffer_` is not empty. This is acceptable because batching is a best
-      // mechanism effort here.
-      if (buffer_.empty() == true)
-      {
-        continue;
-      }
+      continue;
     }
 
     auto start = std::chrono::steady_clock::now();
@@ -142,8 +144,7 @@ void BatchLogProcessor::DoBackgroundWork()
 
 void BatchLogProcessor::Export(const bool was_force_flush_called)
 {
-  std::vector<std::unique_ptr<Recordable>> records_arr;
-
+  // Figure out the number of records to export 
   size_t num_records_to_export;
 
   if (was_force_flush_called == true)
@@ -152,9 +153,13 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
   }
   else
   {
+    // Export the min of max_export_batch_size and buffer_size
     num_records_to_export =
         buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
   }
+
+  // Put the records into a circular buffer
+  std::vector<std::unique_ptr<Recordable>> records_arr;
 
   buffer_.Consume(
       num_records_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
@@ -166,7 +171,7 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
         });
       });
 
-  if (exporter_->Export(records_arr) != ExportResult::kSuccess)
+  if (exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size())) != ExportResult::kSuccess)
   {
     // Indicate Error: "[Batch Log Processor]: Failed to export a batch"
   }
@@ -183,14 +188,9 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
   }
 }
 
-void BatchLogProcessor::DrainQueue()
-{
-  while (buffer_.empty() == false)
-  {
-    Export(false);
-  }
-}
-
+// The processor drains the current buffer of logs before shutting down,
+// by notifying the worker thread the processor is_shutdown,
+// and the worker thread dealing with it accordingly in DoBackgroundWork(). 
 // Note: Timeout functionality is currently not implemented
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
