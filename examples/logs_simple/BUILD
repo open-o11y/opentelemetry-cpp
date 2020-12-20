@@ -12,7 +12,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "logs_example_simple",
+    name = "logs_simple_example",
     srcs = [
         "main.cc",
     ],
