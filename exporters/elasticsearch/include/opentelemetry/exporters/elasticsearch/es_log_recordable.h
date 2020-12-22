@@ -68,10 +68,10 @@ private:
         json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
         return;
       case common::AttributeType::TYPE_STRING:
-    #ifdef HAVE_CSTRING_TYPE
+#ifdef HAVE_CSTRING_TYPE
       // TODO: add C-string as possible value on API surface
       case common::AttributeType::TYPE_CSTRING:
-    #endif
+#endif
 
         json_[name][key.data()] =
             opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();

@@ -20,13 +20,9 @@
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/log_record.h"
 
 #include <time.h>
 #include <iostream>
-
-namespace nostd   = opentelemetry::nostd;
-namespace sdklogs = opentelemetry::sdk::logs;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -75,7 +71,7 @@ struct ElasticsearchExporterOptions
 /**
  * The ElasticsearchLogExporter exports logs to Elasticsearch in JSON format
  */
-class ElasticsearchLogExporter final : public sdklogs::LogExporter
+class ElasticsearchLogExporter final : public opentelemetry::sdk::logs::LogExporter
 {
 public:
   /**
@@ -99,8 +95,9 @@ public:
    * timeout specified from the options passed from the constructor.
    * @param records A list of log records to send to Elasticsearch.
    */
-  sdklogs::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept override;
+  opentelemetry::sdk::logs::ExportResult Export(
+      const opentelemetry::nostdspan<std::unique_ptr<sdk::logs::Recordable>>
+          &records) noexcept override;
 
   /**
    * Shutdown this exporter.
