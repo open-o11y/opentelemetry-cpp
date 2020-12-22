@@ -1,6 +1,5 @@
 #include "opentelemetry/logs/provider.h"
 
-// Logs
 namespace logs  = opentelemetry::logs;
 namespace nostd = opentelemetry::nostd;
 using opentelemetry::logs::Severity;
