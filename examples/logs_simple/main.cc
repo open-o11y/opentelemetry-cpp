@@ -11,6 +11,7 @@
 
 namespace sdklogs  = opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
+namespace nostd = opentelemetry::nostd;
 
 void initLogger()
 {
