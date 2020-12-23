@@ -3,13 +3,13 @@
 #include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/logger.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/simple_log_processor.h"
 
 #include "foo_library/foo_library.h"
 
-namespace sdklogs  = opentelemetry::sdk::logs;
-namespace logs_api = opentelemetry::logs;
+namespace sdklogs       = opentelemetry::sdk::logs;
+namespace logs_api      = opentelemetry::logs;
 namespace logs_exporter = opentelemetry::exporter::logs;
 
 // Options for the elasticsearch exporter, with the default being:
@@ -27,7 +27,7 @@ void initLogger()
   // Attach the exporter to a processor
   auto processor =
       std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
-  
+
   // Create a loggerprovider and attach the processor
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
   {
     options.index_ = argv[1];
   }
-  
+
   // Setup the logging pipeline
   initLogger();
-  
+
   foo_library();
 }

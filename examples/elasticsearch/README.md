@@ -25,7 +25,7 @@ After running the executable, Elasticsearch will now contain the log data that w
 ***Viewing through Elasticsearch***
 
 Type `curl -X GET 'http://localhost:9200/logs/_search?pretty=true'` into a terminal. This querys Elasticsearch for any data under the `logs` index that has a severity of `WARN`. The `pretty=true` portion is optional, but it makes the response from elasticsearch formatted in a human readable way.  The output will contain the 8 logs stored in that index.
-   
+
 ***Viewing through Kibana***
 
 1. Navigate to `localhost:5601` and click on the `Manage` button in the top right corner. Click on `Index Patterns` and then `Create Index Pattern`. Enter `logs` (or the custom name of your index) into the index pattern name and go to next step. Click create `Create index pattern`.

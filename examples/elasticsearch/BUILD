@@ -20,8 +20,8 @@ cc_binary(
     deps = [
         ":foo_library",
         "//api",
-        "//exporters/memory:in_memory_span_exporter",
         "//exporters/elasticsearch:es_log_exporter",
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/logs",
         "@curl",
     ],

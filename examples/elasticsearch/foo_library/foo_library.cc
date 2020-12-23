@@ -29,10 +29,10 @@ void foo_library()
   logger->Fatal("Fatal vector log", vec_);
 
   // Log all the Log Data Model fields
-  auto now = std::chrono::system_clock::now();
-  auto trace_id = opentelemetry::trace::TraceId();
-  auto span_id = opentelemetry::trace::SpanId();
+  auto now         = std::chrono::system_clock::now();
+  auto trace_id    = opentelemetry::trace::TraceId();
+  auto span_id     = opentelemetry::trace::SpanId();
   auto trace_flags = opentelemetry::trace::TraceFlags();
-  logger->Log(opentelemetry::logs::Severity::kInfo, "Name", "Body", {{"Key", "Resources"}}, 
+  logger->Log(opentelemetry::logs::Severity::kInfo, "Name", "Body", {{"Key", "Resources"}},
               {{"Key", "Attributes"}}, trace_id, span_id, trace_flags, now);
 }
