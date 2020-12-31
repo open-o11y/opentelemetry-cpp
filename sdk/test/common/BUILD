@@ -100,6 +100,7 @@ cc_test(
         "attribute_utils_test.cc",
     ],
     deps = [
+        "//api",
         "//sdk:headers",
         "@com_google_googletest//:gtest_main",
     ],

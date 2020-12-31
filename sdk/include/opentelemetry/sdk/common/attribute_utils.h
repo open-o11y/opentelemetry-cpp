@@ -62,7 +62,7 @@ struct AttributeConverter
   OwnedAttributeValue operator()(double v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(nostd::string_view v)
   {
-    return OwnedAttributeValue(std::string(v.data(), v.size()));
+    return OwnedAttributeValue(std::string(v));
   }
 #ifdef HAVE_SPAN_BYTE
   OwnedAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
